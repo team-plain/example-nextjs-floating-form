@@ -14,13 +14,25 @@ const Home: NextPage = () => {
 
   const onSubmit = async () => {
     setIsLoading(true);
-    const res = await axios.post('/api/contact-form', {
-      name,
-      email,
-      message,
-    });
-    setResponse(res.data);
-    setIsLoading(false);
+    try {
+      const res = await axios.post('/api/contact-form', {
+        name,
+        email,
+        message,
+      });
+      setIsLoading(false);
+      setResponse(res.data);
+    } catch (e) {
+      setIsLoading(false);
+      if (axios.isAxiosError(e) && e.response) {
+        console.error(`Request failed: ${e.response.status} ${JSON.stringify(e.response.data, null, 2)}`)
+        setResponse(e.response.data as any);
+        return;
+      } else {
+        throw e;
+      }
+    }
+
   };
 
   return (

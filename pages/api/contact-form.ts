@@ -40,6 +40,13 @@ async function request<Query, Variables>(args: {
 
       // The first `data` is from axios, the second is from `graphql`
       return r.data.data;
+    }).catch(err => {
+      if (axios.isAxiosError(err) && err.response) {
+        console.error(`Request failed: ${err.response.status}: ${JSON.stringify(err.response.data, null, 2)}`)
+      } else {
+        console.error(JSON.stringify(err, null, 2));
+      }
+      throw err;
     });
 }
 
