@@ -160,7 +160,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Step 1: Upsert the customer within Plain.
     const customer = await upsertCustomer({
       email: data.email,
-      fullName: data.customer,
+      fullName: data.name,
     });
 
     // Step 2: Create a Custom Timeline Entry in the customer's timeline
