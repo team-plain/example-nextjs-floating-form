@@ -34,7 +34,11 @@ async function request<Query, Variables>(args: {
       }
     )
     .then((r) => {
-      console.log(r.data.data);
+      if (r.data.errors.length) {
+        throw r.data.errors[0];
+      }
+
+      // The first `data` is from axios, the second is from `graphql`
       return r.data.data;
     });
 }
