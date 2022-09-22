@@ -18,6 +18,7 @@ For this demo you will need to grant the API key the following permissions:
 - `timeline:edit`
 - `customer:create`
 - `customer:edit`
+- `customer:read`
 
 **You will then need to add this key to the .env.local file:**
 
