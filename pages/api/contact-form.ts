@@ -34,7 +34,7 @@ async function request<Query, Variables>(args: {
       }
     )
     .then((r) => {
-      if (r.data.errors.length) {
+      if (r.data.errors?.length) {
         throw r.data.errors[0];
       }
 
