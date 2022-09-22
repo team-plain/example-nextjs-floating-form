@@ -1,59 +1,27 @@
-import axios from "axios";
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useEffect, useState } from "react";
-import styles from "../styles/Home.module.css";
-
-function Spinner() {
-  return (
-    <div className={styles.spinner}>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  );
-}
+import axios from 'axios';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { useState } from 'react';
+import styles from '../styles/index.module.css';
 
 const Home: NextPage = () => {
-  const [message, setMessage] = useState("");
-  const [importance, setImportance] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [customer, setCustomer] = useState<{} | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
-  const fetchCustomer = async () => {
-    const response = await axios.post("/api/create-customer");
-
-    if (response.data.error) {
-      setError(response.data.error);
-      return;
-    }
-
-    setCustomer(response.data);
-  };
-
-  useEffect(() => {
-    if (customer) {
-      return;
-    }
-
-    fetchCustomer();
-  }, [customer]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setResponse] = useState<{ error: string | null } | null>(null);
 
   const onSubmit = async () => {
-    await axios.post("/api/create-custom-timeline-entry", {
-      customer,
+    setIsLoading(true);
+    const res = await axios.post('/api/contact-form', {
+      name,
+      email,
       message,
-      importance,
     });
-
-    setMessage("");
-    setImportance("");
+    setResponse(res.data);
+    setIsLoading(false);
   };
-
-  if (error) {
-    return <div className={styles.error_box}>{error}</div>;
-  }
 
   return (
     <div className={styles.container}>
@@ -63,45 +31,55 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* TODO: Maybe not have loading state? */}
-      {!customer ? (
-        <Spinner />
-      ) : (
-        <>
-          <h1 className={styles.title}>
-            Custom Timeline Entries NextJS Example
-          </h1>
-          <main className={styles.main}>
-            <h2>Feature Request Form</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit();
-              }}
-            >
-              <div className={styles.formfield}>
-                <label className={styles.label}>Message</label>
-                <textarea
-                  className={styles.textarea}
-                  value={message}
-                  onChange={(e) => setMessage(e.currentTarget.value)}
-                />
-              </div>
-              <div className={styles.formfield}>
-                <label className={styles.label}>
-                  How critical/important is this to you?
-                </label>
-                <input
-                  className={styles.input}
-                  value={importance}
-                  onChange={(e) => setImportance(e.currentTarget.value)}
-                />
-              </div>
-              <button className={styles.button}>Submit</button>
-            </form>
-          </main>
-        </>
-      )}
+      <main className={styles.main}>
+        <h2>Contact Form</h2>
+        <p>This is an example contact form to show how Custom Timeline Entries can be used</p>
+        {!res || res.error ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <div className={styles.formfield}>
+              <label className={styles.label}>Name</label>
+              <input
+                placeholder="e.g. Grace Hopper"
+                className={styles.input}
+                value={name}
+                onChange={(e) => setName(e.currentTarget.value)}
+                required
+              />
+            </div>
+            <div className={styles.formfield}>
+              <label className={styles.label}>Email</label>
+              <input
+                type={email}
+                placeholder="e.g. grace.hopper@nasa.com"
+                className={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.currentTarget.value)}
+                required
+              />
+            </div>
+            <div className={styles.formfield}>
+              <label className={styles.label}>Message</label>
+              <textarea
+                className={styles.textarea}
+                value={message}
+                onChange={(e) => setMessage(e.currentTarget.value)}
+                required
+              />
+            </div>
+
+            <button disabled={isLoading} className={styles.button} type="submit">
+              {isLoading ? 'Loading' : 'Submit'}
+            </button>
+          </form>
+        ) : (
+          <p>Contact form submitted succesfully! Go to Plain to check it out.</p>
+        )}
+      </main>
     </div>
   );
 };
