@@ -4,7 +4,7 @@ This NextJS app shows how to build a simple contact form using Plain's [Custom T
 
 This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/api-routes/introduction) (`/api/contact-form.tsx`) which calls the Plain API to:
 
-- Create the customer within Plain of they don't exist
+- Create the customer within Plain if they don't exist
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Moves the customer to the "Waiting for Help" queue
 
