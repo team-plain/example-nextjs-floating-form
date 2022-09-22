@@ -4,7 +4,7 @@ This NextJS app shows how to build a simple contact form using Plain's [Custom T
 
 This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/api-routes/introduction) (`/api/contact-form.tsx`) which calls the Plain API to:
 
-- Create and update a customer within Plain
+- Create the customer within Plain of they don't exist
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Moves the customer to the "Waiting for Help" queue
 
@@ -19,6 +19,10 @@ For this demo you will need to grant the API key the following permissions:
 - `customer:create`
 - `customer:edit`
 
-**You will then need to add this key to the .env.local file**
+**You will then need to add this key to the .env.local file:**
 
-After that you can run `npm run dev` to run the NextJS app and try it out!
+```shell
+echo "PLAIN_API_KEY=plainApiKey_XXXXX" >> .env.local
+```
+
+After that you can run `npm install` followed by `npm run dev` to run the NextJS app and try it out!
