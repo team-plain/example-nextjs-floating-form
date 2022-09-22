@@ -77,7 +77,7 @@ const Home: NextPage = () => {
             </button>
           </form>
         ) : (
-          <p>Contact form submitted succesfully! Go to Plain to check it out.</p>
+          <p>Contact form submitted successfully! Go to Plain to check it out.</p>
         )}
       </main>
     </div>

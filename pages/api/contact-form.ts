@@ -173,7 +173,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     console.log(
-      `Succesfully created custom timeline entry ${entry.id} for customer ${customer.id}`
+      `Successfully created custom timeline entry ${entry.id} for customer ${customer.id}`
     );
 
     return res.status(200).json({ error: null });
