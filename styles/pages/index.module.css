@@ -1,0 +1,47 @@
+
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+}
+
+.titleColumn {
+    background: #FEECFB;
+    padding: 120px 80px;
+}
+
+.formColumn {
+    background: #FFF;
+    padding: 120px;
+}
+
+.preTitle {
+    font-family: Circularpro book,sans-serif;
+    color: #db0bb9;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: .875rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.title {
+    font-family: Circularpro book,sans-serif;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 1.14;
+    margin-bottom: 32px;
+}
+
+.paragraph {
+    font-size: 18px;
+    color: #6c6c89;
+    line-height: 1.7;
+    max-width: 90%;
+}
+
+.paragraph + .paragraph{ 
+    margin-top: 16px;
+}

@@ -1,0 +1,32 @@
+.header {
+    margin-bottom: 32px;
+}
+
+.title {
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 24px;
+}
+
+.description {
+    line-height: 1.5;
+    --tw-text-opacity: 1;
+    color: rgb(108 108 132 / var(--tw-text-opacity));
+}
+
+.paragraph {
+    color: rgb(108 108 132);
+    line-height: 24px;
+}
+
+.basicDetails {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px
+}

@@ -1,0 +1,14 @@
+.label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.helpText {
+    margin-bottom: 12px;
+    --tw-text-opacity: 1;
+    color: rgb(108 108 132 / var(--tw-text-opacity));
+    display: block;
+}

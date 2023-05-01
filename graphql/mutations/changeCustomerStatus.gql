@@ -1,7 +1,0 @@
-mutation changeCustomerStatus($customerId:ID!, $status:CustomerStatus!) {
-  changeCustomerStatusAsync(input:{ customerId: $customerId, status: $status}) {
-    error {
-      message
-    }
-  }
-}

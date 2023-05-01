@@ -5,7 +5,7 @@ mutation upsertCustomTimelineEntry($input: UpsertCustomTimelineEntryInput!) {
       id
       customerId
       timestamp {
-          iso8601
+        iso8601
       }
       entry {
         ... on CustomEntry {

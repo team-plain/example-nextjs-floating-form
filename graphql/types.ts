@@ -24,7 +24,18 @@ export type AcceptWorkspaceInviteOutput = {
   invite?: Maybe<WorkspaceInvite>;
 };
 
-export type Actor = CustomerActor | MachineUserActor | SystemActor | UserActor;
+export type Actor = CustomerActor | DeletedCustomerActor | MachineUserActor | SystemActor | UserActor;
+
+export type AddCustomerToCustomerGroupsInput = {
+  customerGroupIdentifiers: Array<CustomerGroupIdentifier>;
+  customerId: Scalars['ID'];
+};
+
+export type AddCustomerToCustomerGroupsOutput = {
+  __typename?: 'AddCustomerToCustomerGroupsOutput';
+  customerGroupMemberships?: Maybe<Array<CustomerGroupMembership>>;
+  error?: Maybe<MutationError>;
+};
 
 export type ApiKey = {
   __typename?: 'ApiKey';
@@ -63,6 +74,12 @@ export type ArchiveIssueTypeOutput = {
 };
 
 export type AssignCustomerToUserInput = {
+  /**
+   * Should the mutation change the customer's status to Active.
+   *
+   * Defaults to true.
+   */
+  changeCustomerStatusToActive?: InputMaybe<Scalars['Boolean']>;
   customerId: Scalars['ID'];
   userId?: InputMaybe<Scalars['ID']>;
 };
@@ -118,14 +135,18 @@ export type AttachmentUploadUrl = {
   uploadFormUrl: Scalars['String'];
 };
 
+export type BooleanInput = {
+  value: Scalars['Boolean'];
+};
+
 /** A boolean setting */
 export type BooleanSetting = {
   __typename?: 'BooleanSetting';
   /** The value of the setting. This is named uniquely (instead of just `value`) so that the union has unique fields. */
   booleanValue: Scalars['Boolean'];
-  /** The setting code, for a full list of codes, please see: https://docs.plain.com/advanced/settings */
+  /** The setting code, for a full list of codes, please see: https://docs.plain.com/advanced/settings. */
   code: Scalars['String'];
-  /** The scope of the setting */
+  /** The scope of the setting. */
   scope: SettingScope;
 };
 
@@ -139,6 +160,17 @@ export type ChangeCustomerStatusAsyncOutput = {
   error?: Maybe<MutationError>;
 };
 
+export type ChangeCustomerStatusInput = {
+  customerId: Scalars['ID'];
+  status: CustomerStatus;
+};
+
+export type ChangeCustomerStatusOutput = {
+  __typename?: 'ChangeCustomerStatusOutput';
+  customer?: Maybe<Customer>;
+  error?: Maybe<MutationError>;
+};
+
 export type ChangeIssueIssueTypeInput = {
   issueId: Scalars['ID'];
   issueTypeId: Scalars['ID'];
@@ -146,6 +178,17 @@ export type ChangeIssueIssueTypeInput = {
 
 export type ChangeIssueIssueTypeOutput = {
   __typename?: 'ChangeIssueIssueTypeOutput';
+  error?: Maybe<MutationError>;
+  issue?: Maybe<Issue>;
+};
+
+export type ChangeIssuePriorityInput = {
+  issueId: Scalars['ID'];
+  priorityValue: Scalars['Int'];
+};
+
+export type ChangeIssuePriorityOutput = {
+  __typename?: 'ChangeIssuePriorityOutput';
   error?: Maybe<MutationError>;
   issue?: Maybe<Issue>;
 };
@@ -198,13 +241,69 @@ export enum CommunicationChannelInput {
   None = 'NONE'
 }
 
+export type ComponentBadge = {
+  __typename?: 'ComponentBadge';
+  badgeColor?: Maybe<ComponentBadgeColor>;
+  badgeLabel: Scalars['String'];
+};
+
+export enum ComponentBadgeColor {
+  Blue = 'BLUE',
+  Green = 'GREEN',
+  Grey = 'GREY',
+  Red = 'RED',
+  Yellow = 'YELLOW'
+}
+
+export type ComponentBadgeInput = {
+  badgeColor?: InputMaybe<ComponentBadgeColor>;
+  badgeLabel: Scalars['String'];
+};
+
+export type ComponentContainer = {
+  __typename?: 'ComponentContainer';
+  containerContent: Array<ComponentContainerContent>;
+};
+
+export type ComponentContainerContent = ComponentBadge | ComponentCopyButton | ComponentDivider | ComponentLinkButton | ComponentPlainText | ComponentRow | ComponentSpacer | ComponentText;
+
+export type ComponentContainerContentInput = {
+  componentBadge?: InputMaybe<ComponentBadgeInput>;
+  componentCopyButton?: InputMaybe<ComponentCopyButtonInput>;
+  componentDivider?: InputMaybe<ComponentDividerInput>;
+  componentLinkButton?: InputMaybe<ComponentLinkButtonInput>;
+  componentPlainText?: InputMaybe<ComponentPlainTextInput>;
+  componentRow?: InputMaybe<ComponentRowInput>;
+  componentSpacer?: InputMaybe<ComponentSpacerInput>;
+  componentText?: InputMaybe<ComponentTextInput>;
+};
+
+export type ComponentContainerInput = {
+  containerContent: Array<ComponentContainerContentInput>;
+};
+
+export type ComponentCopyButton = {
+  __typename?: 'ComponentCopyButton';
+  copyButtonTooltipLabel?: Maybe<Scalars['String']>;
+  copyButtonValue: Scalars['String'];
+};
+
+export type ComponentCopyButtonInput = {
+  copyButtonTooltipLabel?: InputMaybe<Scalars['String']>;
+  copyButtonValue: Scalars['String'];
+};
+
 export type ComponentDivider = {
   __typename?: 'ComponentDivider';
+  dividerSpacingSize?: Maybe<ComponentDividerSpacingSize>;
+  /** @deprecated use dividerSpacingSize instead */
   spacingSize?: Maybe<ComponentDividerSpacingSize>;
 };
 
 export type ComponentDividerInput = {
-  spacingSize?: InputMaybe<ComponentSpacerSize>;
+  dividerSpacingSize?: InputMaybe<ComponentDividerSpacingSize>;
+  /** @deprecated use dividerSpacingSize instead */
+  spacingSize?: InputMaybe<ComponentDividerSpacingSize>;
 };
 
 export enum ComponentDividerSpacingSize {
@@ -216,21 +315,86 @@ export enum ComponentDividerSpacingSize {
 }
 
 export type ComponentInput = {
+  componentBadge?: InputMaybe<ComponentBadgeInput>;
+  componentContainer?: InputMaybe<ComponentContainerInput>;
+  componentCopyButton?: InputMaybe<ComponentCopyButtonInput>;
   componentDivider?: InputMaybe<ComponentDividerInput>;
-  componentLinkButton?: InputMaybe<ComponentLinkInputButton>;
+  componentLinkButton?: InputMaybe<ComponentLinkButtonInput>;
+  componentPlainText?: InputMaybe<ComponentPlainTextInput>;
+  componentRow?: InputMaybe<ComponentRowInput>;
   componentSpacer?: InputMaybe<ComponentSpacerInput>;
   componentText?: InputMaybe<ComponentTextInput>;
 };
 
 export type ComponentLinkButton = {
   __typename?: 'ComponentLinkButton';
+  /** @deprecated use linkButtonLabel instead */
   label: Scalars['String'];
+  linkButtonLabel: Scalars['String'];
+  linkButtonUrl: Scalars['String'];
+  /** @deprecated use linkButtonUrl instead */
   url: Scalars['String'];
 };
 
-export type ComponentLinkInputButton = {
-  label: Scalars['String'];
-  url: Scalars['String'];
+export type ComponentLinkButtonInput = {
+  /** @deprecated use linkButtonLabel instead */
+  label?: InputMaybe<Scalars['String']>;
+  /** Required input, will be made required after deprecated fields are removed. */
+  linkButtonLabel?: InputMaybe<Scalars['String']>;
+  /** Required input, will be made required after deprecated fields are removed. */
+  linkButtonUrl?: InputMaybe<Scalars['String']>;
+  /** @deprecated use linkButtonUrl instead */
+  url?: InputMaybe<Scalars['String']>;
+};
+
+export type ComponentPlainText = {
+  __typename?: 'ComponentPlainText';
+  plainText: Scalars['String'];
+  plainTextColor?: Maybe<ComponentPlainTextColor>;
+  plainTextSize?: Maybe<ComponentPlainTextSize>;
+};
+
+export enum ComponentPlainTextColor {
+  Error = 'ERROR',
+  Muted = 'MUTED',
+  Normal = 'NORMAL',
+  Success = 'SUCCESS',
+  Warning = 'WARNING'
+}
+
+export type ComponentPlainTextInput = {
+  plainText: Scalars['String'];
+  plainTextColor?: InputMaybe<ComponentPlainTextColor>;
+  plainTextSize?: InputMaybe<ComponentPlainTextSize>;
+};
+
+export enum ComponentPlainTextSize {
+  L = 'L',
+  M = 'M',
+  S = 'S'
+}
+
+export type ComponentRow = {
+  __typename?: 'ComponentRow';
+  rowAsideContent: Array<ComponentRowContent>;
+  rowMainContent: Array<ComponentRowContent>;
+};
+
+export type ComponentRowContent = ComponentBadge | ComponentCopyButton | ComponentDivider | ComponentLinkButton | ComponentPlainText | ComponentSpacer | ComponentText;
+
+export type ComponentRowContentInput = {
+  componentBadge?: InputMaybe<ComponentBadgeInput>;
+  componentCopyButton?: InputMaybe<ComponentCopyButtonInput>;
+  componentDivider?: InputMaybe<ComponentDividerInput>;
+  componentLinkButton?: InputMaybe<ComponentLinkButtonInput>;
+  componentPlainText?: InputMaybe<ComponentPlainTextInput>;
+  componentSpacer?: InputMaybe<ComponentSpacerInput>;
+  componentText?: InputMaybe<ComponentTextInput>;
+};
+
+export type ComponentRowInput = {
+  rowAsideContent: Array<ComponentRowContentInput>;
+  rowMainContent: Array<ComponentRowContentInput>;
 };
 
 export type ComponentSpacer = {
@@ -241,7 +405,9 @@ export type ComponentSpacer = {
 };
 
 export type ComponentSpacerInput = {
+  /** @deprecated user spacerSize instead */
   size?: InputMaybe<ComponentSpacerSize>;
+  /** Required input, will be made required after deprecated fields are removed. */
   spacerSize?: InputMaybe<ComponentSpacerSize>;
 };
 
@@ -273,7 +439,9 @@ export enum ComponentTextColor {
 }
 
 export type ComponentTextInput = {
+  /** @deprecated use textColor instead */
   color?: InputMaybe<ComponentTextColor>;
+  /** @deprecated use textSize instead */
   size?: InputMaybe<ComponentTextSize>;
   text: Scalars['String'];
   textColor?: InputMaybe<ComponentTextColor>;
@@ -322,9 +490,63 @@ export type CreateAttachmentUploadUrlOutput = {
   error?: Maybe<MutationError>;
 };
 
+/**
+ * Input type to create a new customer card config.
+ *
+ * By default new customer cards will have an ordering of 100000 (to place them at the bottom).
+ */
+export type CreateCustomerCardConfigInput = {
+  /** An array of headers name-value pairs (maximum length of array: 20). */
+  apiHeaders: Array<CustomerCardConfigApiHeaderInput>;
+  /** The URL from which this card should be loaded (must start with `https://` and be a valid URL, max length: 600 characters). */
+  apiUrl: Scalars['String'];
+  /** The default time the card should be cached for if no TTL is provided in the card response. (minimum: 15 seconds, maximum: 1 year or  31,536,000 seconds). */
+  defaultTimeToLiveSeconds: Scalars['Int'];
+  /** The key of the card (must be unique in a workspace, max length: 500 characters, must match regex: `[a-zA-Z0-9_-]+`). */
+  key: Scalars['String'];
+  /** The title of the card (max length: 500 characters). */
+  title: Scalars['String'];
+};
+
+export type CreateCustomerCardConfigOutput = {
+  __typename?: 'CreateCustomerCardConfigOutput';
+  /** The created customer card config. */
+  customerCardConfig?: Maybe<CustomerCardConfig>;
+  error?: Maybe<MutationError>;
+};
+
+export type CreateCustomerGroupInput = {
+  color: Scalars['String'];
+  key: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type CreateCustomerGroupOutput = {
+  __typename?: 'CreateCustomerGroupOutput';
+  customerGroup?: Maybe<CustomerGroup>;
+  error?: Maybe<MutationError>;
+};
+
 export type CreateIssueInput = {
   customerId: Scalars['ID'];
   issueTypeId: Scalars['ID'];
+  /**
+   * The priority value for this issue. Overrides the issue's issue type's default priority value.
+   *
+   * Valid values are 0, 1, 2 and 3.
+   */
+  priorityValue?: InputMaybe<Scalars['Int']>;
+};
+
+export type CreateIssueLinkInput = {
+  issueId: Scalars['ID'];
+  linearIssue?: InputMaybe<LinearIssueIssueLinkInput>;
+};
+
+export type CreateIssueLinkOutput = {
+  __typename?: 'CreateIssueLinkOutput';
+  error?: Maybe<MutationError>;
+  issueLink?: Maybe<IssueLink>;
 };
 
 export type CreateIssueOutput = {
@@ -334,6 +556,18 @@ export type CreateIssueOutput = {
 };
 
 export type CreateIssueTypeInput = {
+  /**
+   * The priority value for issues created with this issue type.
+   *
+   * Valid values are 0, 1, 2 and 3.
+   */
+  defaultIssuePriorityValue?: InputMaybe<Scalars['Int']>;
+  /**
+   * The icon to use for this issue type. The maximum length is 50 characters.
+   *
+   * Only lowercase alphanumeric characters, '-' and '_' are allowed.
+   */
+  icon?: InputMaybe<Scalars['String']>;
   publicName: Scalars['String'];
 };
 
@@ -353,6 +587,17 @@ export type CreateMachineUserOutput = {
   __typename?: 'CreateMachineUserOutput';
   error?: Maybe<MutationError>;
   machineUser?: Maybe<MachineUser>;
+};
+
+export type CreateMyLinearIntegrationInput = {
+  authCode: Scalars['String'];
+  redirectUrl: Scalars['String'];
+};
+
+export type CreateMyLinearIntegrationOutput = {
+  __typename?: 'CreateMyLinearIntegrationOutput';
+  error?: Maybe<MutationError>;
+  integration?: Maybe<UserLinearIntegration>;
 };
 
 export type CreateMySlackIntegrationInput = {
@@ -397,6 +642,19 @@ export type CreateUserAccountOutput = {
   __typename?: 'CreateUserAccountOutput';
   error?: Maybe<MutationError>;
   userAccount?: Maybe<UserAccount>;
+};
+
+export type CreateWebhookTargetInput = {
+  description: Scalars['String'];
+  eventSubscriptions: Array<WebhookTargetEventSubscriptionInput>;
+  isEnabled: Scalars['Boolean'];
+  url: Scalars['String'];
+};
+
+export type CreateWebhookTargetOutput = {
+  __typename?: 'CreateWebhookTargetOutput';
+  error?: Maybe<MutationError>;
+  webhookTarget?: Maybe<WebhookTarget>;
 };
 
 export type CreateWorkspaceAppInput = {
@@ -474,7 +732,7 @@ export type CustomEntry = {
   type?: Maybe<Scalars['String']>;
 };
 
-export type CustomTimelineEntryComponent = ComponentDivider | ComponentLinkButton | ComponentSpacer | ComponentText;
+export type CustomTimelineEntryComponent = ComponentBadge | ComponentContainer | ComponentCopyButton | ComponentDivider | ComponentLinkButton | ComponentPlainText | ComponentRow | ComponentSpacer | ComponentText;
 
 /**
  * The core customer entity. A customer only exists (ideally) once.
@@ -484,34 +742,52 @@ export type CustomTimelineEntryComponent = ComponentDivider | ComponentLinkButto
  */
 export type Customer = {
   __typename?: 'Customer';
-  /** When the customer was assigned to a user */
+  /** When the customer was assigned to a user. */
   assignedAt?: Maybe<DateTime>;
-  /** The user the customer is assigned to */
+  /** The user the customer is assigned to. */
   assignedToUser?: Maybe<UserActor>;
   createdAt: DateTime;
   createdBy: Actor;
-  /** The customer's email address */
+  /** A subquery to fetch the customer's group memberships. */
+  customerGroupMemberships: CustomerGroupMembershipConnection;
+  /** The customer's email address. */
   email: EmailAddress;
-  /** Your system's ID for this customer */
+  /** Your system's ID for this customer. */
   externalId?: Maybe<Scalars['ID']>;
-  /** The full name of the customer */
+  /** The full name of the customer. */
   fullName: Scalars['String'];
-  /** Uniquely identifies a customer in Plain */
+  /** Uniquely identifies a customer in Plain. */
   id: Scalars['ID'];
-  /** A subquery to fetch the customer's issues */
+  /** A subquery to fetch the customer's issues. */
   issues: IssueConnection;
-  /** When the customer was last in the `IDLE` status */
+  /** When the customer was last in the `IDLE` status. */
   lastIdleAt?: Maybe<DateTime>;
-  /** An optional short name of the customer, typically their first name */
+  markedAsSpamAt?: Maybe<DateTime>;
+  markedAsSpamBy?: Maybe<InternalActor>;
+  /** An optional short name of the customer, typically their first name. */
   shortName?: Maybe<Scalars['String']>;
-  /** The customer's status */
+  /** The customer's status. */
   status: CustomerStatus;
-  /** When the customer's status was last changed */
+  /** When the customer's status was last changed. */
   statusChangedAt: DateTime;
   /** Metadata about the customer's timeline. This is eventually consistent with the timeline. */
   timelineInfo: TimelineInfo;
   updatedAt: DateTime;
   updatedBy: Actor;
+};
+
+
+/**
+ * The core customer entity. A customer only exists (ideally) once.
+ * Uniqueness is guaranteed on both of these fields:
+ * 1. `externalId` if provided
+ * 2. `email`
+ */
+export type CustomerCustomerGroupMembershipsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -527,6 +803,7 @@ export type CustomerIssuesArgs = {
   filters?: InputMaybe<CustomerIssuesFilter>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
+  sortBy?: InputMaybe<IssuesSort>;
 };
 
 export type CustomerActor = {
@@ -541,6 +818,201 @@ export type CustomerAssignmentTransitionedEntry = {
   nextUserId?: Maybe<Scalars['ID']>;
   previousUser?: Maybe<User>;
   previousUserId?: Maybe<Scalars['ID']>;
+};
+
+export type CustomerCardComponent = ComponentBadge | ComponentContainer | ComponentCopyButton | ComponentDivider | ComponentLinkButton | ComponentPlainText | ComponentRow | ComponentSpacer | ComponentText;
+
+/**
+ * The configuration of a customer card that defines four important things:
+ *
+ * - The title of the card
+ * - The key of the card, which will be used in the request payload to the API URL
+ * - The order in which the cards should appear
+ * - Which API the card should be loaded from (and the required authentication headers)
+ *
+ * Configs that have the same API URL and API Headers will be loaded in batch. API header names are treated case insensitively.
+ *
+ * A maximum of 25 customer cards can be configured.
+ */
+export type CustomerCardConfig = {
+  __typename?: 'CustomerCardConfig';
+  /** An array of headers name-value pairs (maximum length of array: 20). Requires the `customerCardConfigApiDetails:read` permission. */
+  apiHeaders: Array<CustomerCardConfigApiHeader>;
+  /** The URL from which this card should be loaded (must start with `https://` and be a valid URL, max length: 600 characters). Requires the `customerCardConfigApiDetails:read` permission. */
+  apiUrl: Scalars['String'];
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  /** The default time the card should be cached for if no TTL is provided in the card response. (minimum: 15 seconds, maximum: 1 year or  31,536,000 seconds). */
+  defaultTimeToLiveSeconds: Scalars['Int'];
+  /** The ID of the customer card config. */
+  id: Scalars['ID'];
+  /** Indicates if the customer card is enabled or not. Disabled customer card configs are not loaded or displayed for customers. */
+  isEnabled: Scalars['Boolean'];
+  /** The key of the card (must be unique in a workspace, max length: 500 characters, must match regex: `[a-zA-Z0-9_-]+`). */
+  key: Scalars['String'];
+  /**
+   * The order in which this customer card config should be shown.
+   *
+   * Duplicate order numbers are allowed, in case the order is the same they will be sorted based on `id`. The minimum is 0 and the maximum is 100000.
+   */
+  order: Scalars['Int'];
+  /** The title of the card (max length: 500 characters). */
+  title: Scalars['String'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+};
+
+/** An API header that will be sent to the configured API URL. */
+export type CustomerCardConfigApiHeader = {
+  __typename?: 'CustomerCardConfigApiHeader';
+  /** The name of the header, trimmed and treated case insensitively for deduplication purposes (min length: 1, max length: 100). Not all header names are allowed. */
+  name: Scalars['String'];
+  /** The value of the header, treated case sensitively for deduplication purposes (min length: 1, max length: 500). */
+  value: Scalars['String'];
+};
+
+/** An API header that will be sent to the configured API URL. */
+export type CustomerCardConfigApiHeaderInput = {
+  /** The name of the header, trimmed and treated case insensitively for deduplication purposes (min length: 1, max length: 100). Not all header names are allowed. */
+  name: Scalars['String'];
+  /** The value of the header, treated case sensitively for deduplication purposes (min length: 1, max length: 500). */
+  value: Scalars['String'];
+};
+
+export type CustomerCardConfigOrderInput = {
+  /** The ID of the customer card config to be reordered. */
+  customerCardConfigId: Scalars['ID'];
+  /** The order the customer card config should have. */
+  order: Scalars['Int'];
+};
+
+/**
+ * A shared interface for all common properties customer card instances can have.
+ * A customer can only have one customer card instance for each customer card config at any point in time.
+ *
+ * Has 3 implementations:
+ * - `CustomerCardInstanceLoading`
+ * - `CustomerCardInstanceLoaded`
+ * - `CustomerCardInstanceError`
+ */
+export type CustomerCardInstance = {
+  createdAt: DateTime;
+  createdBy: Actor;
+  /** The customer card config this instance is for. */
+  customerCardConfig: CustomerCardConfig;
+  /** The customer the instance is for. */
+  customerId: Scalars['ID'];
+  /** The ID of the customer card instance. A new ID is generated for each load. */
+  id: Scalars['ID'];
+  updatedAt: DateTime;
+  updatedBy: Actor;
+};
+
+export type CustomerCardInstanceChange = {
+  __typename?: 'CustomerCardInstanceChange';
+  changeType: ChangeType;
+  customerCardInstance: CustomerCardInstance;
+};
+
+export type CustomerCardInstanceChangesResult = CustomerCardInstanceChange | SubscriptionAcknowledgement;
+
+export type CustomerCardInstanceError = CustomerCardInstance & {
+  __typename?: 'CustomerCardInstanceError';
+  createdAt: DateTime;
+  createdBy: Actor;
+  /** The customer card config this instance is for. */
+  customerCardConfig: CustomerCardConfig;
+  /** The customer the instance is for. */
+  customerId: Scalars['ID'];
+  /** The details of the customer card load error. */
+  errorDetail: CustomerCardInstanceErrorDetail;
+  /** The ID of the customer card instance. A new ID is generated for each load. */
+  id: Scalars['ID'];
+  updatedAt: DateTime;
+  updatedBy: Actor;
+};
+
+/** Details for the reasons why the customer card failed to load. */
+export type CustomerCardInstanceErrorDetail = CustomerCardInstanceMissingCardErrorDetail | CustomerCardInstanceRequestErrorDetail | CustomerCardInstanceResponseBodyErrorDetail | CustomerCardInstanceStatusCodeErrorDetail | CustomerCardInstanceTimeoutErrorDetail | CustomerCardInstanceUnknownErrorDetail;
+
+/** A loaded customer card. */
+export type CustomerCardInstanceLoaded = CustomerCardInstance & {
+  __typename?: 'CustomerCardInstanceLoaded';
+  /** The list of components of the customer card. If this is null it means the customer card was returned on the API, but the components array was empty. */
+  components?: Maybe<Array<CustomerCardComponent>>;
+  createdAt: DateTime;
+  createdBy: Actor;
+  /** The customer card config this instance is for. */
+  customerCardConfig: CustomerCardConfig;
+  /** The customer the instance is for. */
+  customerId: Scalars['ID'];
+  expiresAt: DateTime;
+  /** The ID of the customer card instance. A new ID is generated for each load. */
+  id: Scalars['ID'];
+  /** When the customer card was received from the API. */
+  loadedAt: DateTime;
+  updatedAt: DateTime;
+  updatedBy: Actor;
+};
+
+/**
+ * A loading customer card. The createdAt timestamp indicates when the load was started.
+ * Will be updated to be a CustomerCardInstanceLoaded or CustomerCardInstanceError.
+ */
+export type CustomerCardInstanceLoading = CustomerCardInstance & {
+  __typename?: 'CustomerCardInstanceLoading';
+  createdAt: DateTime;
+  createdBy: Actor;
+  /** The customer card config this instance is for. */
+  customerCardConfig: CustomerCardConfig;
+  /** The customer the instance is for. */
+  customerId: Scalars['ID'];
+  /** The ID of the customer card instance. A new ID is generated for each load. */
+  id: Scalars['ID'];
+  updatedAt: DateTime;
+  updatedBy: Actor;
+};
+
+/** The configured API URL didn't return a requested card key. */
+export type CustomerCardInstanceMissingCardErrorDetail = {
+  __typename?: 'CustomerCardInstanceMissingCardErrorDetail';
+  cardKey: Scalars['String'];
+  message: Scalars['String'];
+};
+
+/** Plain failed to make the request to the configured API URL. */
+export type CustomerCardInstanceRequestErrorDetail = {
+  __typename?: 'CustomerCardInstanceRequestErrorDetail';
+  errorCode: Scalars['String'];
+  message: Scalars['String'];
+};
+
+/** An invalid response body was returned from the configured API URL. */
+export type CustomerCardInstanceResponseBodyErrorDetail = {
+  __typename?: 'CustomerCardInstanceResponseBodyErrorDetail';
+  message: Scalars['String'];
+  responseBody: Scalars['String'];
+};
+
+/** A non-200 status code was returned from the configured API URL. */
+export type CustomerCardInstanceStatusCodeErrorDetail = {
+  __typename?: 'CustomerCardInstanceStatusCodeErrorDetail';
+  message: Scalars['String'];
+  responseBody: Scalars['String'];
+  statusCode: Scalars['Int'];
+};
+
+/** The card failed to load within the timeout. */
+export type CustomerCardInstanceTimeoutErrorDetail = {
+  __typename?: 'CustomerCardInstanceTimeoutErrorDetail';
+  message: Scalars['String'];
+  timeoutSeconds: Scalars['Int'];
+};
+
+/** An unknown error occurred. If this error is persistent, please contact our support. */
+export type CustomerCardInstanceUnknownErrorDetail = {
+  __typename?: 'CustomerCardInstanceUnknownErrorDetail';
+  message: Scalars['String'];
 };
 
 export type CustomerChange = {
@@ -566,6 +1038,63 @@ export type CustomerEdge = {
   node: Customer;
 };
 
+export type CustomerEmailActor = {
+  __typename?: 'CustomerEmailActor';
+  customer: Customer;
+  customerId: Scalars['ID'];
+};
+
+export type CustomerGroup = {
+  __typename?: 'CustomerGroup';
+  color: Scalars['String'];
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  id: Scalars['ID'];
+  key: Scalars['String'];
+  name: Scalars['String'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+};
+
+export type CustomerGroupConnection = {
+  __typename?: 'CustomerGroupConnection';
+  edges: Array<CustomerGroupEdge>;
+  pageInfo: PageInfo;
+};
+
+export type CustomerGroupEdge = {
+  __typename?: 'CustomerGroupEdge';
+  cursor: Scalars['String'];
+  node: CustomerGroup;
+};
+
+export type CustomerGroupIdentifier = {
+  customerGroupId?: InputMaybe<Scalars['ID']>;
+  customerGroupKey?: InputMaybe<Scalars['String']>;
+};
+
+export type CustomerGroupMembership = {
+  __typename?: 'CustomerGroupMembership';
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  customerGroup: CustomerGroup;
+  customerId: Scalars['ID'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+};
+
+export type CustomerGroupMembershipConnection = {
+  __typename?: 'CustomerGroupMembershipConnection';
+  edges: Array<CustomerGroupMembershipEdge>;
+  pageInfo: PageInfo;
+};
+
+export type CustomerGroupMembershipEdge = {
+  __typename?: 'CustomerGroupMembershipEdge';
+  cursor: Scalars['String'];
+  node: CustomerGroupMembership;
+};
+
 export type CustomerIssuesFilter = {
   statuses?: InputMaybe<Array<IssueStatus>>;
 };
@@ -575,13 +1104,13 @@ export type CustomerIssuesFilter = {
  * Exactly one of them must be provided in a single search condition.
  */
 export type CustomerSearchCondition = {
-  /** Search expression on the customer's email address */
+  /** Search expression on the customer's email address. */
   email?: InputMaybe<StringSearchExpression>;
-  /** Search expression on the customer's external id */
+  /** Search expression on the customer's external id. */
   externalId?: InputMaybe<StringSearchExpression>;
-  /** Search expression on the customer's full name */
+  /** Search expression on the customer's full name. */
   fullName?: InputMaybe<StringSearchExpression>;
-  /** Search expression on the customer's short name */
+  /** Search expression on the customer's short name. */
   shortName?: InputMaybe<StringSearchExpression>;
 };
 
@@ -615,7 +1144,42 @@ export type CustomerStatusTransitionedEntry = {
 
 export type CustomersFilter = {
   assignedToUser?: InputMaybe<Array<Scalars['ID']>>;
+  /**
+   * Filters customers to those with at least one of the given customer group IDs.
+   * Customers with no groups will not be included.
+   * Can be combined with other group filters.
+   */
+  customerGroupIds?: InputMaybe<Array<Scalars['ID']>>;
+  /**
+   * Filters customers to those with at least one of the given customer group keys.
+   * Customers with no groups will not be included.
+   * Can be combined with other group filters.
+   */
+  customerGroupKeys?: InputMaybe<Array<Scalars['String']>>;
   isAssigned?: InputMaybe<Scalars['Boolean']>;
+  /**
+   * When true, filters customers to those with at least one open issue. If false, only customers
+   * who have not been marked as spam will be included.
+   */
+  isMarkedAsSpam?: InputMaybe<Scalars['Boolean']>;
+  /**
+   * Filters customers to those with at least one issue of the given issue priority values.
+   * Customers with no issues will not be included.
+   * Can be combined with other issue filters.
+   */
+  issuePriorityValues?: InputMaybe<Array<Scalars['Int']>>;
+  /**
+   * Filters customers to those with at least one issue of the given issue statuses (OPEN or RESOLVED).
+   * Customers with no issues will not be included.
+   * Can be combined with other issue filters.
+   */
+  issueStatuses?: InputMaybe<Array<IssueStatus>>;
+  /**
+   * Filters customers to those with at least one issue of the given issue type IDs.
+   * Customers with no issues will not be included.
+   * Can be combined with other issue filters.
+   */
+  issueTypeIds?: InputMaybe<Array<Scalars['ID']>>;
   lastCommunicationChannels?: InputMaybe<Array<CommunicationChannelInput>>;
   statuses?: InputMaybe<Array<CustomerStatus>>;
 };
@@ -637,6 +1201,12 @@ export type CustomersSort = {
 export enum CustomersSortField {
   FullName = 'FULL_NAME',
   LastIdleAt = 'LAST_IDLE_AT',
+  /**
+   * Sort based on the minimum value amongst all the customer's open issues' priorities.
+   *
+   * When sorting ascending, most urgent issues will be first. Otherwise, last.
+   */
+  OpenIssuesPrioritiesMinValue = 'OPEN_ISSUES_PRIORITIES_MIN_VALUE',
   StatusChangedAt = 'STATUS_CHANGED_AT',
   TimelineInfoCustomerWaitingForReplySince = 'TIMELINE_INFO_CUSTOMER_WAITING_FOR_REPLY_SINCE'
 }
@@ -657,8 +1227,46 @@ export type DeleteApiKeyOutput = {
   error?: Maybe<MutationError>;
 };
 
+export type DeleteCustomerCardConfigInput = {
+  /** The customer card config ID to delete. */
+  customerCardConfigId: Scalars['ID'];
+};
+
+export type DeleteCustomerCardConfigOutput = {
+  __typename?: 'DeleteCustomerCardConfigOutput';
+  error?: Maybe<MutationError>;
+};
+
+export type DeleteCustomerGroupInput = {
+  customerGroupId: Scalars['ID'];
+};
+
+export type DeleteCustomerGroupOutput = {
+  __typename?: 'DeleteCustomerGroupOutput';
+  error?: Maybe<MutationError>;
+};
+
+export type DeleteCustomerInput = {
+  customerId: Scalars['ID'];
+};
+
+export type DeleteCustomerOutput = {
+  __typename?: 'DeleteCustomerOutput';
+  error?: Maybe<MutationError>;
+};
+
 export type DeleteIssueInput = {
   issueId: Scalars['ID'];
+};
+
+export type DeleteIssueLinkInput = {
+  issueLinkId: Scalars['ID'];
+};
+
+export type DeleteIssueLinkOutput = {
+  __typename?: 'DeleteIssueLinkOutput';
+  error?: Maybe<MutationError>;
+  issueLink?: Maybe<IssueLink>;
 };
 
 export type DeleteIssueOutput = {
@@ -675,6 +1283,11 @@ export type DeleteMachineUserOutput = {
   __typename?: 'DeleteMachineUserOutput';
   error?: Maybe<MutationError>;
   machineUser?: Maybe<MachineUser>;
+};
+
+export type DeleteMyLinearIntegrationOutput = {
+  __typename?: 'DeleteMyLinearIntegrationOutput';
+  error?: Maybe<MutationError>;
 };
 
 export type DeleteMySlackIntegrationOutput = {
@@ -708,6 +1321,15 @@ export type DeleteUserInput = {
 
 export type DeleteUserOutput = {
   __typename?: 'DeleteUserOutput';
+  error?: Maybe<MutationError>;
+};
+
+export type DeleteWebhookTargetInput = {
+  webhookTargetId: Scalars['ID'];
+};
+
+export type DeleteWebhookTargetOutput = {
+  __typename?: 'DeleteWebhookTargetOutput';
   error?: Maybe<MutationError>;
 };
 
@@ -766,6 +1388,16 @@ export type DeleteWorkspaceSlackIntegrationOutput = {
   integration?: Maybe<WorkspaceSlackIntegration>;
 };
 
+export type DeletedCustomerActor = {
+  __typename?: 'DeletedCustomerActor';
+  customerId: Scalars['ID'];
+};
+
+export type DeletedCustomerEmailActor = {
+  __typename?: 'DeletedCustomerEmailActor';
+  customerId: Scalars['ID'];
+};
+
 export type DnsRecord = {
   __typename?: 'DnsRecord';
   isVerified: Scalars['Boolean'];
@@ -794,7 +1426,9 @@ export type Email = {
   updatedBy: Actor;
 };
 
-/** An object modelling an email address and if it's been verified */
+export type EmailActor = CustomerEmailActor | DeletedCustomerEmailActor | SupportEmailAddressEmailActor | UserEmailActor;
+
+/** An object modelling an email address and if it's been verified. */
 export type EmailAddress = {
   __typename?: 'EmailAddress';
   /** The email address. */
@@ -823,10 +1457,25 @@ export type EmailEntry = {
   authenticity: EmailAuthenticity;
   emailId: Scalars['ID'];
   from: EmailParticipant;
+  /** The full email's markdown content, including all replies. */
+  fullMarkdownContent?: Maybe<Scalars['String']>;
+  /** The full email's text content, including all replies. */
+  fullTextContent?: Maybe<Scalars['String']>;
+  /** Boolean indicating whether there is more markdown content available that can be resolved via the `fullMarkdownContent` field. */
+  hasMoreMarkdownContent: Scalars['Boolean'];
+  /** Boolean indicating whether there is more text content available that can be resolved via the `fullTextContent` field. */
+  hasMoreTextContent: Scalars['Boolean'];
   hiddenRecipients: Array<EmailParticipant>;
+  /** Whether this email entry is the start of a new thread in Plain. Can be used to show the full email content. */
+  isStartOfThread: Scalars['Boolean'];
+  /** The most recent email's markdown content. */
   markdownContent?: Maybe<Scalars['String']>;
+  /** When the email was received by Plain. */
+  receivedAt?: Maybe<DateTime>;
+  /** When the email was sent. Initially set to null while the email is being processed. */
   sentAt?: Maybe<DateTime>;
   subject?: Maybe<Scalars['String']>;
+  /** The most recent email's text content. */
   textContent?: Maybe<Scalars['String']>;
   to: EmailParticipant;
 };
@@ -834,6 +1483,7 @@ export type EmailEntry = {
 export type EmailParticipant = {
   __typename?: 'EmailParticipant';
   email: Scalars['String'];
+  emailActor?: Maybe<EmailActor>;
   name?: Maybe<Scalars['String']>;
 };
 
@@ -843,13 +1493,17 @@ export type EmailParticipantInput = {
 };
 
 /** A union of all possible entries that can appear in a timeline. */
-export type Entry = ChatEntry | CustomEntry | CustomerAssignmentTransitionedEntry | CustomerStatusTransitionedEntry | EmailEntry | IssueDeletedEntry | IssueIssueTypeChangedEntry | IssueStatusTransitionedEntry | NoteEntry;
+export type Entry = ChatEntry | CustomEntry | CustomerAssignmentTransitionedEntry | CustomerStatusTransitionedEntry | EmailEntry | IssueDeletedEntry | IssueIssueTypeChangedEntry | IssuePriorityChangedEntry | IssueStatusTransitionedEntry | LinearIssueLinkStateTransitionedEntry | NoteEntry;
 
 export type FileSize = {
   __typename?: 'FileSize';
   bytes: Scalars['Int'];
   kiloBytes: Scalars['Float'];
   megaBytes: Scalars['Float'];
+};
+
+export type IntInput = {
+  value: Scalars['Int'];
 };
 
 export type InternalActor = MachineUserActor | SystemActor | UserActor;
@@ -876,9 +1530,20 @@ export type Issue = {
   isDeleted: Scalars['Boolean'];
   issueKey: Scalars['String'];
   issueType: IssueType;
+  links: IssueLinkConnection;
+  /** The priority of the issue. May be different to the default priority of the issue type. */
+  priority: IssuePriority;
   status: IssueStatus;
   updatedAt: DateTime;
   updatedBy: Actor;
+};
+
+
+export type IssueLinksArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
 };
 
 export type IssueChange = {
@@ -897,8 +1562,10 @@ export type IssueDeletedEntry = {
   __typename?: 'IssueDeletedEntry';
   issueId: Scalars['ID'];
   issueKey: Scalars['String'];
+  issueTypeIcon?: Maybe<Scalars['String']>;
   issueTypeId: Scalars['ID'];
   issueTypePublicName: Scalars['String'];
+  priority: IssuePriority;
   status: IssueStatus;
 };
 
@@ -912,10 +1579,68 @@ export type IssueIssueTypeChangedEntry = {
   __typename?: 'IssueIssueTypeChangedEntry';
   issueId: Scalars['ID'];
   issueKey: Scalars['String'];
+  nextIssueTypeIcon?: Maybe<Scalars['String']>;
   nextIssueTypeId: Scalars['ID'];
   nextIssueTypePublicName: Scalars['String'];
+  previousIssueTypeIcon?: Maybe<Scalars['String']>;
   previousIssueTypeId: Scalars['ID'];
   previousIssueTypePublicName: Scalars['String'];
+  priority: IssuePriority;
+  status: IssueStatus;
+};
+
+export type IssueLink = {
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  id: Scalars['ID'];
+  issue: Issue;
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+};
+
+export type IssueLinkConnection = {
+  __typename?: 'IssueLinkConnection';
+  edges: Array<IssueLinkEdge>;
+  pageInfo: PageInfo;
+};
+
+export type IssueLinkEdge = {
+  __typename?: 'IssueLinkEdge';
+  cursor: Scalars['String'];
+  node: IssueLink;
+};
+
+/** The priority of an issue. */
+export type IssuePriority = {
+  __typename?: 'IssuePriority';
+  /** The display name of the priority. */
+  label: Scalars['String'];
+  /**
+   * The value of the priority. Lower values are higher priority.
+   *
+   * Valid values are 0, 1, 2 and 3. 0 is the highest priority.
+   */
+  value: Scalars['Int'];
+};
+
+/** Added to the timeline when an issue's priority changes. */
+export type IssuePriorityChangedEntry = {
+  __typename?: 'IssuePriorityChangedEntry';
+  /** The ID of the issue that changed priority. */
+  issueId: Scalars['ID'];
+  /** The key of the issue that changed priority. */
+  issueKey: Scalars['String'];
+  /** The icon of the issue type of the issue that changed priority. */
+  issueTypeIcon?: Maybe<Scalars['String']>;
+  /** The ID of the issue type of the issue that changed priority. */
+  issueTypeId: Scalars['ID'];
+  /** The public name of the issue type of the issue that changed priority. */
+  issueTypePublicName: Scalars['String'];
+  /** The current issue priority. */
+  nextPriority: IssuePriority;
+  /** The previous issue priority. */
+  previousPriority: IssuePriority;
+  /** The current issue status. */
   status: IssueStatus;
 };
 
@@ -928,10 +1653,12 @@ export type IssueStatusTransitionedEntry = {
   __typename?: 'IssueStatusTransitionedEntry';
   issueId: Scalars['ID'];
   issueKey: Scalars['String'];
+  issueTypeIcon?: Maybe<Scalars['String']>;
   issueTypeId: Scalars['ID'];
   issueTypePublicName: Scalars['String'];
   nextStatus: IssueStatus;
   previousStatus?: Maybe<IssueStatus>;
+  priority: IssuePriority;
 };
 
 export type IssueType = {
@@ -940,6 +1667,10 @@ export type IssueType = {
   archivedBy?: Maybe<InternalActor>;
   createdAt: DateTime;
   createdBy: InternalActor;
+  /** The default priority for issues of this type. */
+  defaultIssuePriority: IssuePriority;
+  /** The icon for this issue type. */
+  icon?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   isArchived: Scalars['Boolean'];
   publicName: Scalars['String'];
@@ -965,7 +1696,54 @@ export type IssueTypeFilter = {
 
 export type IssuesFilter = {
   customerId?: InputMaybe<Scalars['ID']>;
+  issueTypeIds?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filters issues to those with the given issue priority values. */
+  priorityValues?: InputMaybe<Array<Scalars['Int']>>;
   statuses?: InputMaybe<Array<IssueStatus>>;
+};
+
+export type IssuesSort = {
+  direction: SortDirection;
+  field: IssuesSortField;
+};
+
+export enum IssuesSortField {
+  /** Sort by the issue's priority value. */
+  PriorityValue = 'PRIORITY_VALUE'
+}
+
+export type LinearIntegrationToken = {
+  __typename?: 'LinearIntegrationToken';
+  token: Scalars['String'];
+};
+
+export type LinearIssueIssueLink = IssueLink & {
+  __typename?: 'LinearIssueIssueLink';
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  id: Scalars['ID'];
+  issue: Issue;
+  linearIssueId: Scalars['ID'];
+  linearIssueUrl: Scalars['String'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+};
+
+export type LinearIssueIssueLinkInput = {
+  linearIssueId: Scalars['ID'];
+  linearIssueUrl: Scalars['String'];
+};
+
+export type LinearIssueLinkStateTransitionedEntry = {
+  __typename?: 'LinearIssueLinkStateTransitionedEntry';
+  issueId: Scalars['ID'];
+  issueKey: Scalars['String'];
+  issueTypeIcon?: Maybe<Scalars['String']>;
+  issueTypeId: Scalars['ID'];
+  issueTypePublicName: Scalars['String'];
+  linearIssueId: Scalars['ID'];
+  nextLinearStateId: Scalars['ID'];
+  previousLinearStateId: Scalars['ID'];
 };
 
 export type MachineUser = {
@@ -1016,6 +1794,16 @@ export type MachineUserEdge = {
   node: MachineUser;
 };
 
+export type MarkCustomerAsSpamInput = {
+  customerId: Scalars['ID'];
+};
+
+export type MarkCustomerAsSpamOutput = {
+  __typename?: 'MarkCustomerAsSpamOutput';
+  customer?: Maybe<Customer>;
+  error?: Maybe<MutationError>;
+};
+
 export type MarkTimelineAsReadInput = {
   customerId: Scalars['ID'];
   lastTimelineEntryId: Scalars['ID'];
@@ -1026,25 +1814,48 @@ export type MarkTimelineAsReadOutput = {
   error?: Maybe<MutationError>;
 };
 
+export type MonthlyUsage = {
+  __typename?: 'MonthlyUsage';
+  activeUniqueCustomerCount: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvite: AcceptWorkspaceInviteOutput;
+  /** Add a customer to a customer group. */
+  addCustomerToCustomerGroups: AddCustomerToCustomerGroupsOutput;
   archiveIssueType: ArchiveIssueTypeOutput;
   assignCustomerToUser: AssignCustomerToUserOutput;
   assignRolesToUser: AssignRolesToUserOutput;
+  /** Changes a customer's status to the provided status. */
+  changeCustomerStatus: ChangeCustomerStatusOutput;
+  /**
+   * Changes a customer's status to the provided status asynchronously.
+   *
+   * Note: This mutation fires events that will eventually cause the customers status to update if applicable. See changeCustomerStatus for a sync version of this mutation.
+   */
   changeCustomerStatusAsync: ChangeCustomerStatusAsyncOutput;
   changeIssueIssueType: ChangeIssueIssueTypeOutput;
+  changeIssuePriority: ChangeIssuePriorityOutput;
   changeUserStatus: ChangeUserStatusOutput;
   createApiKey: CreateApiKeyOutput;
   createAttachmentDownloadUrl: CreateAttachmentDownloadUrlOutput;
   createAttachmentUploadUrl: CreateAttachmentUploadUrlOutput;
+  /** Creates a customer card config. A maximum of 25 card configs can be created. */
+  createCustomerCardConfig: CreateCustomerCardConfigOutput;
+  /** Create a new customer group. */
+  createCustomerGroup: CreateCustomerGroupOutput;
   createIssue: CreateIssueOutput;
+  createIssueLink: CreateIssueLinkOutput;
   createIssueType: CreateIssueTypeOutput;
   createMachineUser: CreateMachineUserOutput;
+  createMyLinearIntegration: CreateMyLinearIntegrationOutput;
   createMySlackIntegration: CreateMySlackIntegrationOutput;
   createNote: CreateNoteOutput;
   createSnippet: CreateSnippetOutput;
   createUserAccount: CreateUserAccountOutput;
+  /** Creates a webhook target. */
+  createWebhookTarget: CreateWebhookTargetOutput;
   createWorkspace: CreateWorkspaceOutput;
   createWorkspaceApp: CreateWorkspaceAppOutput;
   createWorkspaceAppPublicKey: CreateWorkspaceAppPublicKeyOutput;
@@ -1052,12 +1863,22 @@ export type Mutation = {
   createWorkspaceEmailDomainSettings: CreateWorkspaceEmailDomainSettingsOutput;
   createWorkspaceSlackIntegration: CreateWorkspaceSlackIntegrationOutput;
   deleteApiKey: DeleteApiKeyOutput;
+  /** Deletes a customer and all of their data stored on Plain. This action cannot be reversed. */
+  deleteCustomer: DeleteCustomerOutput;
+  /** Deletes a customer card config. */
+  deleteCustomerCardConfig: DeleteCustomerCardConfigOutput;
+  /** Delete a customer group by ID. */
+  deleteCustomerGroup: DeleteCustomerGroupOutput;
   deleteIssue: DeleteIssueOutput;
+  deleteIssueLink: DeleteIssueLinkOutput;
   deleteMachineUser: DeleteMachineUserOutput;
+  deleteMyLinearIntegration: DeleteMyLinearIntegrationOutput;
   deleteMySlackIntegration: DeleteMySlackIntegrationOutput;
   deleteNote: DeleteNoteOutput;
   deleteSnippet: DeleteSnippetOutput;
   deleteUser: DeleteUserOutput;
+  /** Deletes a webhook target. */
+  deleteWebhookTarget: DeleteWebhookTargetOutput;
   deleteWorkspaceApp: DeleteWorkspaceAppOutput;
   deleteWorkspaceAppPublicKey: DeleteWorkspaceAppPublicKeyOutput;
   deleteWorkspaceDiscordIntegration: DeleteWorkspaceDiscordIntegrationOutput;
@@ -1065,19 +1886,46 @@ export type Mutation = {
   deleteWorkspaceInvite: DeleteWorkspaceInviteOutput;
   deleteWorkspaceSlackIntegration: DeleteWorkspaceSlackIntegrationOutput;
   inviteUserToWorkspace: InviteUserToWorkspaceOutput;
+  /** Marks a customer as spam. */
+  markCustomerAsSpam: MarkCustomerAsSpamOutput;
   markTimelineAsRead: MarkTimelineAsReadOutput;
+  /**
+   * Reloads a customer card for a customer.
+   *
+   * Will discard whatever is in the cache and reload it from the configured API URL.
+   */
+  reloadCustomerCardInstance: ReloadCustomerCardInstanceOutput;
+  /** Remove a customer from a customer group. */
+  removeCustomerFromCustomerGroups: RemoveCustomerFromCustomerGroupsOutput;
   reopenIssue: ReopenIssueOutput;
+  /**
+   * Reorders customer card configs.
+   *
+   * The input can be a partial input and in that case not all configs will be reordered.
+   * For example this allows two configs to be swapped with each other.
+   *
+   * Note: Duplicate orders are allowed by the API.
+   */
+  reorderCustomerCardConfigs: ReorderCustomerCardConfigsOutput;
   replyToEmail: ReplyToEmailOutput;
   resolveIssue: ResolveIssueOutput;
   sendChat: SendChatOutput;
   sendNewEmail: SendNewEmailOutput;
   unarchiveIssueType: UnarchiveIssueTypeOutput;
   unassignAllCustomers: UnassignAllCustomersOutput;
+  /** Removes the spam mark from a customer. */
+  unmarkCustomerAsSpam: UnmarkCustomerAsSpamOutput;
+  /** Partially updates a customer card config. */
+  updateCustomerCardConfig: UpdateCustomerCardConfigOutput;
+  /** Update a customer group. */
+  updateCustomerGroup: UpdateCustomerGroupOutput;
   updateIssueType: UpdateIssueTypeOutput;
   updateMachineUser: UpdateMachineUserOutput;
-  /** Updates a setting. For more information about this mutation please see: https://docs.plain.com/advanced/settings */
+  /** Updates a setting. For more information about this mutation please see: https://docs.plain.com/advanced/settings. */
   updateSetting: UpdateSettingOutput;
   updateSnippet: UpdateSnippetOutput;
+  /** Updates a webhook target. */
+  updateWebhookTarget: UpdateWebhookTargetOutput;
   updateWorkspace: UpdateWorkspaceOutput;
   updateWorkspaceChatSettings: UpdateWorkspaceChatSettingsOutput;
   updateWorkspaceEmailSettings: UpdateWorkspaceEmailSettingsOutput;
@@ -1090,6 +1938,11 @@ export type Mutation = {
 
 export type MutationAcceptWorkspaceInviteArgs = {
   input: AcceptWorkspaceInviteInput;
+};
+
+
+export type MutationAddCustomerToCustomerGroupsArgs = {
+  input: AddCustomerToCustomerGroupsInput;
 };
 
 
@@ -1108,6 +1961,11 @@ export type MutationAssignRolesToUserArgs = {
 };
 
 
+export type MutationChangeCustomerStatusArgs = {
+  input: ChangeCustomerStatusInput;
+};
+
+
 export type MutationChangeCustomerStatusAsyncArgs = {
   input: ChangeCustomerStatusAsyncInput;
 };
@@ -1115,6 +1973,11 @@ export type MutationChangeCustomerStatusAsyncArgs = {
 
 export type MutationChangeIssueIssueTypeArgs = {
   input: ChangeIssueIssueTypeInput;
+};
+
+
+export type MutationChangeIssuePriorityArgs = {
+  input: ChangeIssuePriorityInput;
 };
 
 
@@ -1138,8 +2001,23 @@ export type MutationCreateAttachmentUploadUrlArgs = {
 };
 
 
+export type MutationCreateCustomerCardConfigArgs = {
+  input: CreateCustomerCardConfigInput;
+};
+
+
+export type MutationCreateCustomerGroupArgs = {
+  input: CreateCustomerGroupInput;
+};
+
+
 export type MutationCreateIssueArgs = {
   input: CreateIssueInput;
+};
+
+
+export type MutationCreateIssueLinkArgs = {
+  input: CreateIssueLinkInput;
 };
 
 
@@ -1150,6 +2028,11 @@ export type MutationCreateIssueTypeArgs = {
 
 export type MutationCreateMachineUserArgs = {
   input: CreateMachineUserInput;
+};
+
+
+export type MutationCreateMyLinearIntegrationArgs = {
+  input: CreateMyLinearIntegrationInput;
 };
 
 
@@ -1170,6 +2053,11 @@ export type MutationCreateSnippetArgs = {
 
 export type MutationCreateUserAccountArgs = {
   input: CreateUserAccountInput;
+};
+
+
+export type MutationCreateWebhookTargetArgs = {
+  input: CreateWebhookTargetInput;
 };
 
 
@@ -1208,8 +2096,28 @@ export type MutationDeleteApiKeyArgs = {
 };
 
 
+export type MutationDeleteCustomerArgs = {
+  input: DeleteCustomerInput;
+};
+
+
+export type MutationDeleteCustomerCardConfigArgs = {
+  input: DeleteCustomerCardConfigInput;
+};
+
+
+export type MutationDeleteCustomerGroupArgs = {
+  input: DeleteCustomerGroupInput;
+};
+
+
 export type MutationDeleteIssueArgs = {
   input: DeleteIssueInput;
+};
+
+
+export type MutationDeleteIssueLinkArgs = {
+  input: DeleteIssueLinkInput;
 };
 
 
@@ -1230,6 +2138,11 @@ export type MutationDeleteSnippetArgs = {
 
 export type MutationDeleteUserArgs = {
   input: DeleteUserInput;
+};
+
+
+export type MutationDeleteWebhookTargetArgs = {
+  input: DeleteWebhookTargetInput;
 };
 
 
@@ -1263,13 +2176,33 @@ export type MutationInviteUserToWorkspaceArgs = {
 };
 
 
+export type MutationMarkCustomerAsSpamArgs = {
+  input: MarkCustomerAsSpamInput;
+};
+
+
 export type MutationMarkTimelineAsReadArgs = {
   input: MarkTimelineAsReadInput;
 };
 
 
+export type MutationReloadCustomerCardInstanceArgs = {
+  input: ReloadCustomerCardInstanceInput;
+};
+
+
+export type MutationRemoveCustomerFromCustomerGroupsArgs = {
+  input: RemoveCustomerFromCustomerGroupsInput;
+};
+
+
 export type MutationReopenIssueArgs = {
   input: ReopenIssueInput;
+};
+
+
+export type MutationReorderCustomerCardConfigsArgs = {
+  input: ReorderCustomerCardConfigsInput;
 };
 
 
@@ -1303,6 +2236,21 @@ export type MutationUnassignAllCustomersArgs = {
 };
 
 
+export type MutationUnmarkCustomerAsSpamArgs = {
+  input: UnmarkCustomerAsSpamInput;
+};
+
+
+export type MutationUpdateCustomerCardConfigArgs = {
+  input: UpdateCustomerCardConfigInput;
+};
+
+
+export type MutationUpdateCustomerGroupArgs = {
+  input: UpdateCustomerGroupInput;
+};
+
+
 export type MutationUpdateIssueTypeArgs = {
   input: UpdateIssueTypeInput;
 };
@@ -1320,6 +2268,11 @@ export type MutationUpdateSettingArgs = {
 
 export type MutationUpdateSnippetArgs = {
   input: UpdateSnippetInput;
+};
+
+
+export type MutationUpdateWebhookTargetArgs = {
+  input: UpdateWebhookTargetInput;
 };
 
 
@@ -1390,7 +2343,7 @@ export type MutationFieldError = {
 export enum MutationFieldErrorType {
   /** The input field referenced an entity that wasn't found. */
   NotFound = 'NOT_FOUND',
-  /** The field is required to be provided. String inputs may be trimmed and checked for emptyness. */
+  /** The field is required to be provided. String inputs may be trimmed and checked for emptiness. */
   Required = 'REQUIRED',
   /** The field was provided, but didn't pass the requirements of the field. See `message` for details on why. */
   Validation = 'VALIDATION'
@@ -1438,12 +2391,39 @@ export type Query = {
   customer?: Maybe<Customer>;
   customerByEmail?: Maybe<Customer>;
   customerByExternalId?: Maybe<Customer>;
+  customerCardConfig?: Maybe<CustomerCardConfig>;
+  customerCardConfigs: Array<CustomerCardConfig>;
+  /**
+   * Loads the customer's card instances.
+   *
+   * This query will return any cards that are loaded and within their expiry time.
+   * For cards that are past their expiry or are errored it will request a load of the cards and
+   * return a `CustomerCardInstanceLoading`.
+   *
+   * A maximum of 25 card instances will be returned, due to only allowing 25 customer card configs.
+   */
+  customerCardInstances: Array<CustomerCardInstance>;
+  /** Get a customer group by ID. */
+  customerGroup?: Maybe<CustomerGroup>;
+  /** Get a paginated list of customer groups. */
+  customerGroups: CustomerGroupConnection;
   customers: CustomerConnection;
   issue?: Maybe<Issue>;
+  /**
+   * Returns an issue type by ID or null if the issue type is not found.
+   *
+   * Archived issue types are also returned, see isArchived, archivedAt and archivedBy fields on the IssueType type.
+   */
+  issueType?: Maybe<IssueType>;
   issueTypes: IssueTypeConnection;
   issues: IssueConnection;
   machineUser?: Maybe<MachineUser>;
   machineUsers: MachineUserConnection;
+  /** Gets usage for a given month for the current workspace. */
+  monthlyUsage: MonthlyUsage;
+  myLinearInstallationInfo: UserLinearInstallationInfo;
+  myLinearIntegration?: Maybe<UserLinearIntegration>;
+  myLinearIntegrationToken?: Maybe<LinearIntegrationToken>;
   mySlackInstallationInfo: UserSlackInstallationInfo;
   mySlackIntegration?: Maybe<UserSlackIntegration>;
   myUser?: Maybe<User>;
@@ -1459,14 +2439,27 @@ export type Query = {
   searchCustomers: CustomerSearchConnection;
   /**
    * Gets a single setting based on the code and the scope.
-   * For a list of codes and more details, please see: https://docs.plain.com/advanced/settings
+   * For a list of codes and more details, please see: https://docs.plain.com/advanced/settings.
    */
   setting?: Maybe<Setting>;
   snippet?: Maybe<Snippet>;
   snippets: SnippetConnection;
+  /** List all the events types you can subscribe to. */
+  subscriptionEventTypes: Array<SubscriptionEventType>;
   timelineEntries: TimelineEntryConnection;
+  timelineEntry?: Maybe<TimelineEntry>;
   user?: Maybe<User>;
+  /**
+   * Returns a user by email or null if the user is not found.
+   *
+   * Deleted users are also returned, see isDeleted, deletedAt and deletedBy fields on the User type.
+   */
+  userByEmail?: Maybe<User>;
   users: UserConnection;
+  /** Gets a webhook target. */
+  webhookTarget?: Maybe<WebhookTarget>;
+  /** List webhook targets. */
+  webhookTargets: WebhookTargetConnection;
   workspace?: Maybe<Workspace>;
   workspaceApp?: Maybe<WorkspaceApp>;
   workspaceAppPublicKeys: WorkspaceAppPublicKeyConnection;
@@ -1497,6 +2490,29 @@ export type QueryCustomerByExternalIdArgs = {
 };
 
 
+export type QueryCustomerCardConfigArgs = {
+  customerCardConfigId: Scalars['ID'];
+};
+
+
+export type QueryCustomerCardInstancesArgs = {
+  customerId: Scalars['ID'];
+};
+
+
+export type QueryCustomerGroupArgs = {
+  customerGroupId: Scalars['ID'];
+};
+
+
+export type QueryCustomerGroupsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QueryCustomersArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
@@ -1509,6 +2525,11 @@ export type QueryCustomersArgs = {
 
 export type QueryIssueArgs = {
   issueId: Scalars['ID'];
+};
+
+
+export type QueryIssueTypeArgs = {
+  issueTypeId: Scalars['ID'];
 };
 
 
@@ -1527,6 +2548,7 @@ export type QueryIssuesArgs = {
   filters?: InputMaybe<IssuesFilter>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
+  sortBy?: InputMaybe<IssuesSort>;
 };
 
 
@@ -1540,6 +2562,16 @@ export type QueryMachineUsersArgs = {
   before?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QueryMonthlyUsageArgs = {
+  month: Scalars['String'];
+};
+
+
+export type QueryMyLinearInstallationInfoArgs = {
+  redirectUrl: Scalars['String'];
 };
 
 
@@ -1609,8 +2641,19 @@ export type QueryTimelineEntriesArgs = {
 };
 
 
+export type QueryTimelineEntryArgs = {
+  customerId: Scalars['ID'];
+  timelineEntryId: Scalars['ID'];
+};
+
+
 export type QueryUserArgs = {
   userId: Scalars['ID'];
+};
+
+
+export type QueryUserByEmailArgs = {
+  email: Scalars['String'];
 };
 
 
@@ -1618,6 +2661,19 @@ export type QueryUsersArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
   filters?: InputMaybe<UsersFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QueryWebhookTargetArgs = {
+  webhookTargetId: Scalars['ID'];
+};
+
+
+export type QueryWebhookTargetsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
 };
@@ -1688,6 +2744,28 @@ export type QueryWorkspaceSlackIntegrationsArgs = {
   last?: InputMaybe<Scalars['Int']>;
 };
 
+export type ReloadCustomerCardInstanceInput = {
+  customerCardConfigId: Scalars['ID'];
+  customerId: Scalars['ID'];
+};
+
+export type ReloadCustomerCardInstanceOutput = {
+  __typename?: 'ReloadCustomerCardInstanceOutput';
+  /** The reloaded customer card instance. Currently this will always be a `CustomerCardInstanceLoading` type. */
+  customerCardInstance?: Maybe<CustomerCardInstance>;
+  error?: Maybe<MutationError>;
+};
+
+export type RemoveCustomerFromCustomerGroupsInput = {
+  customerGroupIdentifiers: Array<CustomerGroupIdentifier>;
+  customerId: Scalars['ID'];
+};
+
+export type RemoveCustomerFromCustomerGroupsOutput = {
+  __typename?: 'RemoveCustomerFromCustomerGroupsOutput';
+  error?: Maybe<MutationError>;
+};
+
 export type ReopenIssueInput = {
   issueId: Scalars['ID'];
 };
@@ -1696,6 +2774,18 @@ export type ReopenIssueOutput = {
   __typename?: 'ReopenIssueOutput';
   error?: Maybe<MutationError>;
   issue?: Maybe<Issue>;
+};
+
+export type ReorderCustomerCardConfigsInput = {
+  /** An array of ordering updates. */
+  customerCardConfigOrders: Array<CustomerCardConfigOrderInput>;
+};
+
+export type ReorderCustomerCardConfigsOutput = {
+  __typename?: 'ReorderCustomerCardConfigsOutput';
+  /** The reordered customer card configs. */
+  customerCardConfigs?: Maybe<Array<CustomerCardConfig>>;
+  error?: Maybe<MutationError>;
 };
 
 export type ReplyToEmailInput = {
@@ -1771,7 +2861,7 @@ export type SendNewEmailOutput = {
   error?: Maybe<MutationError>;
 };
 
-/** A union of different types of settings */
+/** A union of different types of settings. */
 export type Setting = BooleanSetting;
 
 export type SettingScope = {
@@ -1784,12 +2874,17 @@ export type SettingScope = {
 export type SettingScopeInput = {
   /** An optional ID input. Depends on the type of scope if this is required. */
   id?: InputMaybe<Scalars['ID']>;
-  /** Determines the type of the scope */
+  /** Determines the type of the scope. */
   scopeType: SettingScopeType;
 };
 
 /** An enum to describe the type of scope the setting is for. */
 export enum SettingScopeType {
+  /**
+   * Scope for any user level settings
+   * An `id` is not needed as it will implicitly be the authenticated user's id.
+   */
+  User = 'USER',
   /**
    * Scope for the authenticated user's email notification settings.
    * An `id` is not needed as it will implicitly be the authenticated user's id.
@@ -1800,6 +2895,11 @@ export enum SettingScopeType {
    * An `id` is not needed as it will implicitly be the authenticated user's id.
    */
   UserSlackNotifications = 'USER_SLACK_NOTIFICATIONS',
+  /**
+   * Scope for workspace level settings for the whole workspace.
+   * An `id` is not needed as it will implicitly be the current workspace id.
+   */
+  Workspace = 'WORKSPACE',
   /**
    * Scope for discord notifications configured for the whole workspace.
    * An `id` is mandatory and should be a workspace discord integration id (`wsDiscordInt_123`)
@@ -1813,7 +2913,7 @@ export enum SettingScopeType {
 }
 
 /**
- * An input "union" where exactly one field may be be provided as an input
+ * An input "union" where exactly one field may be be provided as an input.
  * Current API only supports booleans but as the API expands more optional fields will be added.
  */
 export type SettingValueInput = {
@@ -1867,10 +2967,16 @@ export type StringSearchExpression = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  customerCardInstanceChanges: CustomerCardInstanceChangesResult;
   customerChanges: CustomerChange;
   issueChanges: IssueChange;
   timelineChanges: TimelineEntryChange;
   userChanges: UserChange;
+};
+
+
+export type SubscriptionCustomerCardInstanceChangesArgs = {
+  customerId: Scalars['ID'];
 };
 
 
@@ -1881,6 +2987,22 @@ export type SubscriptionCustomerChangesArgs = {
 
 export type SubscriptionTimelineChangesArgs = {
   customerId: Scalars['ID'];
+};
+
+export type SubscriptionAcknowledgement = {
+  __typename?: 'SubscriptionAcknowledgement';
+  subscriptionId: Scalars['ID'];
+};
+
+export type SubscriptionEventType = {
+  __typename?: 'SubscriptionEventType';
+  description: Scalars['String'];
+  eventType: Scalars['String'];
+};
+
+export type SupportEmailAddressEmailActor = {
+  __typename?: 'SupportEmailAddressEmailActor';
+  supportEmailAddress: Scalars['String'];
 };
 
 export type SystemActor = {
@@ -1962,7 +3084,69 @@ export type UnassignAllCustomersOutput = {
   unassignedCustomerCount?: Maybe<Scalars['Int']>;
 };
 
+export type UnmarkCustomerAsSpamInput = {
+  customerId: Scalars['ID'];
+};
+
+export type UnmarkCustomerAsSpamOutput = {
+  __typename?: 'UnmarkCustomerAsSpamOutput';
+  customer?: Maybe<Customer>;
+  error?: Maybe<MutationError>;
+};
+
+/** For constraints and details on the fields see the `CustomerCardConfig` type. */
+export type UpdateCustomerCardConfigInput = {
+  /** If provided, will replace the existing API headers. Requires the `customerCardConfigApiDetails:edit` permission. */
+  apiHeaders?: InputMaybe<Array<CustomerCardConfigApiHeaderInput>>;
+  /** If provided, will update the API URL. Requires the `customerCardConfigApiDetails:edit` permission. */
+  apiUrl?: InputMaybe<StringInput>;
+  /** The customer card config to update. */
+  customerCardConfigId: Scalars['ID'];
+  /** If provided, will update the default time to live seconds. */
+  defaultTimeToLiveSeconds?: InputMaybe<IntInput>;
+  /** If provided, will update the enabled flag. */
+  isEnabled?: InputMaybe<BooleanInput>;
+  /** If provided, will update the key. Keys must be unique in a workspace. */
+  key?: InputMaybe<StringInput>;
+  /** If provided, will update the order. */
+  order?: InputMaybe<IntInput>;
+  /** If provided, will update the title. */
+  title?: InputMaybe<StringInput>;
+};
+
+export type UpdateCustomerCardConfigOutput = {
+  __typename?: 'UpdateCustomerCardConfigOutput';
+  /** The updated customer card config. */
+  customerCardConfig?: Maybe<CustomerCardConfig>;
+  error?: Maybe<MutationError>;
+};
+
+export type UpdateCustomerGroupInput = {
+  color?: InputMaybe<StringInput>;
+  customerGroupId: Scalars['ID'];
+  key?: InputMaybe<StringInput>;
+  name?: InputMaybe<StringInput>;
+};
+
+export type UpdateCustomerGroupOutput = {
+  __typename?: 'UpdateCustomerGroupOutput';
+  customerGroup?: Maybe<CustomerGroup>;
+  error?: Maybe<MutationError>;
+};
+
 export type UpdateIssueTypeInput = {
+  /**
+   * The priority value for issues created with this issue type.
+   *
+   * Valid values are 0, 1, 2 and 3.
+   */
+  defaultIssuePriorityValue?: InputMaybe<IntInput>;
+  /**
+   * The icon to use for this issue type. The maximum length is 50 characters.
+   *
+   * Only lowercase alphanumeric characters, '-' and '_' are allowed.
+   */
+  icon?: InputMaybe<StringInput>;
   issueTypeId: Scalars['ID'];
   publicName?: InputMaybe<StringInput>;
 };
@@ -1988,14 +3172,14 @@ export type UpdateMachineUserOutput = {
 
 /**
  * An input provided to the `updateSetting` mutation.
- * For more info on settings, please see: https://docs.plain.com/advanced/settings
+ * For more info on settings, please see: https://docs.plain.com/advanced/settings.
  */
 export type UpdateSettingInput = {
-  /** A code for the setting */
+  /** A code for the setting. */
   code: Scalars['String'];
-  /** A valid scope for the setting code. To see what the valid scopes are for a specific setting, please see: https://docs.plain.com/advanced/settings */
+  /** A valid scope for the setting code. To see what the valid scopes are for a specific setting, please see: https://docs.plain.com/advanced/settings. */
   scope: SettingScopeInput;
-  /** The setting value */
+  /** The setting value. */
   value: SettingValueInput;
 };
 
@@ -2006,7 +3190,7 @@ export type UpdateSettingInput = {
 export type UpdateSettingOutput = {
   __typename?: 'UpdateSettingOutput';
   error?: Maybe<MutationError>;
-  /** The updated setting */
+  /** The updated setting. */
   setting?: Maybe<Setting>;
 };
 
@@ -2020,6 +3204,20 @@ export type UpdateSnippetOutput = {
   __typename?: 'UpdateSnippetOutput';
   error?: Maybe<MutationError>;
   snippet?: Maybe<Snippet>;
+};
+
+export type UpdateWebhookTargetInput = {
+  description?: InputMaybe<StringInput>;
+  eventSubscriptions?: InputMaybe<Array<WebhookTargetEventSubscriptionInput>>;
+  isEnabled?: InputMaybe<BooleanInput>;
+  url?: InputMaybe<StringInput>;
+  webhookTargetId: Scalars['ID'];
+};
+
+export type UpdateWebhookTargetOutput = {
+  __typename?: 'UpdateWebhookTargetOutput';
+  error?: Maybe<MutationError>;
+  webhookTarget?: Maybe<WebhookTarget>;
 };
 
 export type UpdateWorkspaceChatSettingsInput = {
@@ -2061,10 +3259,24 @@ export type UploadFormData = {
 
 export type UpsertCustomTimelineEntryInput = {
   attachmentIds?: InputMaybe<Array<Scalars['ID']>>;
+  /**
+   * When true, this will change the customer's status to "Active". This is useful if you are using custom timeline
+   * entries for contact form submissions or other events which require some attention.
+   *
+   * Defaults to false.
+   */
+  changeCustomerStatusToActive?: InputMaybe<Scalars['Boolean']>;
   components: Array<ComponentInput>;
   customerId: Scalars['ID'];
   expiresAt?: InputMaybe<Scalars['String']>;
   externalId?: InputMaybe<Scalars['ID']>;
+  /**
+   * When true, this will send a notification for the customer when the custom timeline entry is created. It will only
+   * send the notification if the user has enabled the matching notification setting.
+   *
+   * Defaults to false.
+   */
+  sendCustomTimelineEntryCreatedNotification?: InputMaybe<Scalars['Boolean']>;
   timestamp?: InputMaybe<Scalars['String']>;
   title: Scalars['String'];
   type?: InputMaybe<Scalars['String']>;
@@ -2090,6 +3302,7 @@ export type UpsertCustomerInput = {
 };
 
 export type UpsertCustomerOnCreateInput = {
+  customerGroupIdentifiers?: InputMaybe<Array<CustomerGroupIdentifier>>;
   email: EmailAddressInput;
   externalId?: InputMaybe<Scalars['ID']>;
   fullName: Scalars['String'];
@@ -2122,13 +3335,13 @@ export type User = {
   createdBy: InternalActor;
   deletedAt?: Maybe<DateTime>;
   deletedBy?: Maybe<Actor>;
-  /** The email associated with this user. Email is unique per user */
+  /** The email associated with this user. Email is unique per user. */
   email: Scalars['String'];
-  /** The full name e.g. Grace Hopper */
+  /** The full name e.g. Grace Hopper. */
   fullName: Scalars['String'];
   id: Scalars['ID'];
   isDeleted: Scalars['Boolean'];
-  /** A short name for use in UI e.g. Grace */
+  /** A short name for use in UI e.g. Grace. */
   publicName: Scalars['String'];
   /** Retrieve roles for a specific workspace + user. */
   roles: Array<Role>;
@@ -2140,12 +3353,12 @@ export type User = {
 
 export type UserAccount = {
   __typename?: 'UserAccount';
-  /** The email associated with this user. Email is unique per user */
+  /** The email associated with this user. Email is unique per user. */
   email: Scalars['String'];
-  /** The full name e.g. Grace Hopper */
+  /** The full name e.g. Grace Hopper. */
   fullName: Scalars['String'];
   id: Scalars['ID'];
-  /** A short name for use in UI e.g. Grace */
+  /** A short name for use in UI e.g. Grace. */
   publicName: Scalars['String'];
 };
 
@@ -2171,6 +3384,28 @@ export type UserEdge = {
   __typename?: 'UserEdge';
   cursor: Scalars['String'];
   node: User;
+};
+
+export type UserEmailActor = {
+  __typename?: 'UserEmailActor';
+  user: User;
+  userId: Scalars['ID'];
+};
+
+export type UserLinearInstallationInfo = {
+  __typename?: 'UserLinearInstallationInfo';
+  installationUrl: Scalars['String'];
+};
+
+export type UserLinearIntegration = {
+  __typename?: 'UserLinearIntegration';
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  integrationId: Scalars['ID'];
+  linearOrganisationId: Scalars['ID'];
+  linearOrganisationName: Scalars['String'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
 };
 
 export type UserSlackInstallationInfo = {
@@ -2215,11 +3450,46 @@ export type VerifyWorkspaceEmailForwardingSettingsOutput = {
   workspaceEmailDomainSettings?: Maybe<WorkspaceEmailDomainSettings>;
 };
 
+export type WebhookTarget = {
+  __typename?: 'WebhookTarget';
+  createdAt: DateTime;
+  createdBy: InternalActor;
+  description: Scalars['String'];
+  eventSubscriptions: Array<WebhookTargetEventSubscription>;
+  id: Scalars['ID'];
+  isEnabled: Scalars['Boolean'];
+  updatedAt: DateTime;
+  updatedBy: InternalActor;
+  url: Scalars['String'];
+};
+
+export type WebhookTargetConnection = {
+  __typename?: 'WebhookTargetConnection';
+  edges: Array<WebhookTargetEdge>;
+  pageInfo: PageInfo;
+};
+
+export type WebhookTargetEdge = {
+  __typename?: 'WebhookTargetEdge';
+  cursor: Scalars['String'];
+  node: WebhookTarget;
+};
+
+export type WebhookTargetEventSubscription = {
+  __typename?: 'WebhookTargetEventSubscription';
+  eventType: Scalars['String'];
+};
+
+export type WebhookTargetEventSubscriptionInput = {
+  eventType: Scalars['String'];
+};
+
 export type Workspace = {
   __typename?: 'Workspace';
   createdAt: DateTime;
   createdBy: InternalActor;
   id: Scalars['ID'];
+  isDemoWorkspace: Scalars['Boolean'];
   name: Scalars['String'];
   publicName: Scalars['String'];
   updatedAt: DateTime;
@@ -2328,28 +3598,29 @@ export type WorkspaceEmailDomainSettings = {
 
 export type WorkspaceEmailSettings = {
   __typename?: 'WorkspaceEmailSettings';
+  bccEmail?: Maybe<Scalars['String']>;
   isEnabled: Scalars['Boolean'];
   workspaceEmailDomainSettings?: Maybe<WorkspaceEmailDomainSettings>;
 };
 
 export type WorkspaceInvite = {
   __typename?: 'WorkspaceInvite';
-  /** When the invite was created */
+  /** When the invite was created. */
   createdAt: DateTime;
-  /** Who sent this invite */
+  /** Who sent this invite. */
   createdBy: InternalActor;
-  /** The email that is being invited */
+  /** The email that is being invited. */
   email: Scalars['String'];
   id: Scalars['ID'];
-  /** Whether the person has accepted the invite */
+  /** Whether the person has accepted the invite. */
   isAccepted: Scalars['Boolean'];
-  /** The roles that the invite will assign on workspace joining */
+  /** The roles that the invite will assign on workspace joining. */
   roles: Array<Role>;
-  /** When the invite was updated */
+  /** When the invite was updated. */
   updatedAt: DateTime;
-  /** Who updated this invite */
+  /** Who updated this invite. */
   updatedBy: InternalActor;
-  /** The workspace they are being invited to */
+  /** The workspace they are being invited to. */
   workspace: Workspace;
 };
 
@@ -2394,20 +3665,19 @@ export type WorkspaceSlackIntegrationEdge = {
   node: WorkspaceSlackIntegration;
 };
 
-export type ChangeCustomerStatusMutationVariables = Exact<{
-  customerId: Scalars['ID'];
-  status: CustomerStatus;
+export type CreateIssueMutationVariables = Exact<{
+  input: CreateIssueInput;
 }>;
 
 
-export type ChangeCustomerStatusMutation = { __typename?: 'Mutation', changeCustomerStatusAsync: { __typename?: 'ChangeCustomerStatusAsyncOutput', error?: { __typename?: 'MutationError', message: string } | null } };
+export type CreateIssueMutation = { __typename?: 'Mutation', createIssue: { __typename?: 'CreateIssueOutput', issue?: { __typename?: 'Issue', id: string } | null, error?: { __typename?: 'MutationError', message: string, type: MutationErrorType, code: string, fields: Array<{ __typename?: 'MutationFieldError', field: string, message: string, type: MutationFieldErrorType }> } | null } };
 
 export type UpsertCustomTimelineEntryMutationVariables = Exact<{
   input: UpsertCustomTimelineEntryInput;
 }>;
 
 
-export type UpsertCustomTimelineEntryMutation = { __typename?: 'Mutation', upsertCustomTimelineEntry: { __typename?: 'UpsertCustomTimelineEntryOutput', result?: UpsertResult | null, timelineEntry?: { __typename?: 'TimelineEntry', id: string, customerId: string, timestamp: { __typename?: 'DateTime', iso8601: string }, entry: { __typename?: 'ChatEntry' } | { __typename?: 'CustomEntry', title: string, components: Array<{ __typename: 'ComponentDivider', spacingSize?: ComponentDividerSpacingSize | null } | { __typename: 'ComponentLinkButton', url: string, label: string } | { __typename: 'ComponentSpacer', spacerSize: ComponentSpacerSize } | { __typename: 'ComponentText', text: string, textSize?: ComponentTextSize | null, textColor?: ComponentTextColor | null }> } | { __typename?: 'CustomerAssignmentTransitionedEntry' } | { __typename?: 'CustomerStatusTransitionedEntry' } | { __typename?: 'EmailEntry' } | { __typename?: 'IssueDeletedEntry' } | { __typename?: 'IssueIssueTypeChangedEntry' } | { __typename?: 'IssueStatusTransitionedEntry' } | { __typename?: 'NoteEntry' }, actor: { __typename?: 'CustomerActor' } | { __typename?: 'MachineUserActor', machineUser: { __typename?: 'MachineUser', id: string, fullName: string, publicName: string } } | { __typename?: 'SystemActor' } | { __typename?: 'UserActor' } } | null, error?: { __typename?: 'MutationError', message: string, type: MutationErrorType, code: string, fields: Array<{ __typename?: 'MutationFieldError', field: string, message: string, type: MutationFieldErrorType }> } | null } };
+export type UpsertCustomTimelineEntryMutation = { __typename?: 'Mutation', upsertCustomTimelineEntry: { __typename?: 'UpsertCustomTimelineEntryOutput', result?: UpsertResult | null, timelineEntry?: { __typename?: 'TimelineEntry', id: string, customerId: string, timestamp: { __typename?: 'DateTime', iso8601: string }, entry: { __typename?: 'ChatEntry' } | { __typename?: 'CustomEntry', title: string, components: Array<{ __typename?: 'ComponentBadge' } | { __typename?: 'ComponentContainer' } | { __typename?: 'ComponentCopyButton' } | { __typename: 'ComponentDivider', spacingSize?: ComponentDividerSpacingSize | null } | { __typename: 'ComponentLinkButton', url: string, label: string } | { __typename?: 'ComponentPlainText' } | { __typename?: 'ComponentRow' } | { __typename: 'ComponentSpacer', spacerSize: ComponentSpacerSize } | { __typename: 'ComponentText', text: string, textSize?: ComponentTextSize | null, textColor?: ComponentTextColor | null }> } | { __typename?: 'CustomerAssignmentTransitionedEntry' } | { __typename?: 'CustomerStatusTransitionedEntry' } | { __typename?: 'EmailEntry' } | { __typename?: 'IssueDeletedEntry' } | { __typename?: 'IssueIssueTypeChangedEntry' } | { __typename?: 'IssuePriorityChangedEntry' } | { __typename?: 'IssueStatusTransitionedEntry' } | { __typename?: 'LinearIssueLinkStateTransitionedEntry' } | { __typename?: 'NoteEntry' }, actor: { __typename?: 'CustomerActor' } | { __typename?: 'DeletedCustomerActor' } | { __typename?: 'MachineUserActor', machineUser: { __typename?: 'MachineUser', id: string, fullName: string, publicName: string } } | { __typename?: 'SystemActor' } | { __typename?: 'UserActor' } } | null, error?: { __typename?: 'MutationError', message: string, type: MutationErrorType, code: string, fields: Array<{ __typename?: 'MutationFieldError', field: string, message: string, type: MutationFieldErrorType }> } | null } };
 
 export type UpsertCustomerMutationVariables = Exact<{
   input: UpsertCustomerInput;
@@ -2417,6 +3687,6 @@ export type UpsertCustomerMutationVariables = Exact<{
 export type UpsertCustomerMutation = { __typename?: 'Mutation', upsertCustomer: { __typename?: 'UpsertCustomerOutput', result?: UpsertResult | null, customer?: { __typename?: 'Customer', id: string, externalId?: string | null, shortName?: string | null, fullName: string, status: CustomerStatus, email: { __typename?: 'EmailAddress', email: string, isVerified: boolean } } | null, error?: { __typename?: 'MutationError', message: string, type: MutationErrorType, code: string, fields: Array<{ __typename?: 'MutationFieldError', field: string, message: string, type: MutationFieldErrorType }> } | null } };
 
 
-export const ChangeCustomerStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"changeCustomerStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"customerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CustomerStatus"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changeCustomerStatusAsync"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"customerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"customerId"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"error"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<ChangeCustomerStatusMutation, ChangeCustomerStatusMutationVariables>;
+export const CreateIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createIssue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateIssueInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createIssue"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"error"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"fields"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"field"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateIssueMutation, CreateIssueMutationVariables>;
 export const UpsertCustomTimelineEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"upsertCustomTimelineEntry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertCustomTimelineEntryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertCustomTimelineEntry"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"result"}},{"kind":"Field","name":{"kind":"Name","value":"timelineEntry"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"customerId"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"iso8601"}}]}},{"kind":"Field","name":{"kind":"Name","value":"entry"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CustomEntry"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"components"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ComponentText"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"textSize"}},{"kind":"Field","name":{"kind":"Name","value":"textColor"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ComponentSpacer"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"spacerSize"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ComponentDivider"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"spacingSize"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ComponentLinkButton"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"label"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"actor"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MachineUserActor"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"machineUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fullName"}},{"kind":"Field","name":{"kind":"Name","value":"publicName"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"error"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"fields"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"field"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpsertCustomTimelineEntryMutation, UpsertCustomTimelineEntryMutationVariables>;
 export const UpsertCustomerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"upsertCustomer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertCustomerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertCustomer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"result"}},{"kind":"Field","name":{"kind":"Name","value":"customer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"externalId"}},{"kind":"Field","name":{"kind":"Name","value":"shortName"}},{"kind":"Field","name":{"kind":"Name","value":"fullName"}},{"kind":"Field","name":{"kind":"Name","value":"email"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"isVerified"}}]}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"error"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"fields"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"field"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpsertCustomerMutation, UpsertCustomerMutationVariables>;

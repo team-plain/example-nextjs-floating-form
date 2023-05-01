@@ -1,27 +1,36 @@
 import axios from 'axios';
 import { print } from 'graphql';
+import assert from 'assert-ts';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import {
-  ChangeCustomerStatusDocument,
-  CustomerStatus,
+  ComponentInput,
+  ComponentSpacerSize,
+  ComponentTextColor,
+  ComponentTextSize,
+  CreateIssueDocument,
+  CreateIssueInput,
   UpsertCustomerDocument,
   UpsertCustomTimelineEntryDocument,
+  UpsertCustomTimelineEntryInput,
 } from '../../graphql/types';
-
-const apiKey = process.env.PLAIN_API_KEY;
-
-if (!apiKey) {
-  throw new Error('PLAIN_API_KEY environment variable not set. Add it to .env.local');
-}
+import { ContactFormIssue, ContactFormPayload } from '../../src/contactFormTypes';
 
 async function request<Query, Variables>(args: {
   query: TypedDocumentNode<Query, Variables>;
   variables?: Variables;
 }): Promise<Query> {
+  const apiKey = process.env.PLAIN_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('PLAIN_API_KEY environment variable not set. Add it to .env.local');
+  }
+
+  const apiUrl = process.env.PLAIN_CORE_API || 'https://core-api.uk.plain.com/graphql/v1';
+
   return await axios
     .post(
-      'https://core-api.uk.plain.com/graphql/v1',
+      apiUrl,
       {
         query: print(args.query),
         variables: args.variables,
@@ -40,9 +49,12 @@ async function request<Query, Variables>(args: {
 
       // The first `data` is from axios, the second is from `graphql`
       return r.data.data;
-    }).catch(err => {
+    })
+    .catch((err) => {
       if (axios.isAxiosError(err) && err.response) {
-        console.error(`Request failed: ${err.response.status}: ${JSON.stringify(err.response.data, null, 2)}`)
+        console.error(
+          `Request failed: ${err.response.status}: ${JSON.stringify(err.response.data, null, 2)}`
+        );
       } else {
         console.error(JSON.stringify(err, null, 2));
       }
@@ -89,26 +101,11 @@ async function upsertCustomer(inputs: { email: string; fullName: string }) {
 /**
  * This creates or updates a custom timeline entry
  */
-async function upsertCustomTimelineEntry(inputs: {
-  customerId: string;
-  name: string;
-  email: string;
-  message: string;
-}) {
+async function upsertCustomTimelineEntry(input: UpsertCustomTimelineEntryInput) {
   const res = await request({
     query: UpsertCustomTimelineEntryDocument,
     variables: {
-      input: {
-        customerId: inputs.customerId,
-        title: 'Contact form!',
-        components: [
-          {
-            componentText: {
-              text: inputs.message,
-            },
-          },
-        ],
-      },
+      input,
     },
   });
 
@@ -117,44 +114,140 @@ async function upsertCustomTimelineEntry(inputs: {
     throw new Error(
       res.upsertCustomTimelineEntry.error
         ? res.upsertCustomTimelineEntry.error.message
-        : `Failed to upsert customer: ${res.upsertCustomTimelineEntry.error}`
+        : `Failed to upsert custom timeline entry for customer: ${input.customerId}`
     );
   }
 
   console.log(
-    `Custom timeline entry successfully upserted ${res.upsertCustomTimelineEntry.timelineEntry.id}`
+    `Custom timeline entry successfully upserted: ${res.upsertCustomTimelineEntry.timelineEntry.id}`
   );
   return res.upsertCustomTimelineEntry.timelineEntry;
 }
 
-/**
- * This changes the customer status so that they are shown in the right customer queue.
- */
-async function changeCustomerStatus(inputs: { customerId: string; status: CustomerStatus }) {
+async function createIssue(input: CreateIssueInput) {
   const res = await request({
-    query: ChangeCustomerStatusDocument,
+    query: CreateIssueDocument,
     variables: {
-      customerId: inputs.customerId,
-      status: inputs.status,
+      input,
     },
   });
 
-  if (res.changeCustomerStatusAsync.error) {
-    console.error(`Failed to change customer status`, res.changeCustomerStatusAsync.error);
-    throw new Error(res.changeCustomerStatusAsync.error.message);
+  if (!res.createIssue.issue || res.createIssue.error) {
+    console.error(`Failed to create issue`, res.createIssue.error);
+    throw new Error(
+      res.createIssue.error ? res.createIssue.error.message : 'Failed to create issue.'
+    );
   }
 
-  console.log(
-    `Custom status change requested for customer ${inputs.customerId} (Status: ${inputs.status})`
-  );
+  console.log(`Issue succesfully created ${res.createIssue.issue.id}`);
+  return res.createIssue.issue;
+}
+
+export function isNotNull<T>(n: T | null): n is T {
+  return n !== null;
+}
+
+function makeCustomTimelineEntryComponentInput(
+  fields: ContactFormPayload['fields']
+): ComponentInput[] {
+  let input: ComponentInput[] = [];
+
+  fields.forEach((f) => {
+    switch (f.type) {
+      case 'text': {
+        input.push({
+          componentText: {
+            text: f.text,
+          },
+        });
+        return;
+      }
+      case 'spacer': {
+        input.push({
+          componentSpacer: {
+            spacerSize:
+              f.size === 's'
+                ? ComponentSpacerSize.S
+                : f.size === 'm'
+                ? ComponentSpacerSize.M
+                : ComponentSpacerSize.L,
+          },
+        });
+        return;
+      }
+      case 'key-value': {
+        if (f.orientation === 'vertical') {
+          input.push(
+            {
+              componentText: {
+                textColor: ComponentTextColor.Muted,
+                text: f.label,
+              },
+            },
+            {
+              componentSpacer: {
+                spacerSize: ComponentSpacerSize.Xs,
+              },
+            },
+            {
+              componentText: {
+                text: f.value,
+              },
+            }
+          );
+        } else {
+          input.push({
+            componentRow: {
+              rowMainContent: [
+                {
+                  componentText: {
+                    text: f.label,
+                    textColor: ComponentTextColor.Muted,
+                  },
+                },
+              ],
+              rowAsideContent: [
+                {
+                  componentText: {
+                    text: f.value,
+                  },
+                },
+              ],
+            },
+          });
+        }
+      }
+    }
+  });
+
+  return input;
+}
+
+function getIssueTypeId(contactFormIssue: ContactFormIssue) {
+  const map: { [bug in ContactFormIssue['issueType']]: string } = {
+    bug: process.env.PLAIN_BUG_ISSUE_TYPE_ID || '',
+    demo: process.env.PLAIN_DEMO_ISSUE_TYPE_ID || '',
+    security: process.env.PLAIN_SECURITY_ISSUE_TYPE_ID || '',
+    question: process.env.PLAIN_QUESTION_ISSUE_TYPE_ID || '',
+  };
+
+  const issueTypeId = map[contactFormIssue.issueType];
+
+  if (!issueTypeId) {
+    throw new Error(`Issue type id not set ${contactFormIssue.issueType}`);
+  }
+
+  return issueTypeId;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body;
+  const parseResult = ContactFormPayload.safeParse(req.body);
 
-  if (!data.email || !data.name || !data.message) {
-    return res.status(400).send({ error: 'Email, name and message are all required.' });
+  if (!parseResult.success) {
+    return res.status(400).send({ error: parseResult.error.message });
   }
+
+  const data = parseResult.data;
 
   try {
     // Step 1: Upsert the customer within Plain.
@@ -165,23 +258,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Step 2: Create a Custom Timeline Entry in the customer's timeline
     // with the contents of their contact form submission.
-    const entry = await upsertCustomTimelineEntry({
+    await upsertCustomTimelineEntry({
       customerId: customer.id,
-      name: data.name,
-      email: data.email,
-      message: data.message,
+      title: data.title,
+      changeCustomerStatusToActive: true,
+      components: makeCustomTimelineEntryComponentInput(data.fields),
     });
 
-    // Step 3: Change the customer's status to active so they enter the
-    // "Waiting for help" queue.
-    await changeCustomerStatus({
-      customerId: customer.id,
-      status: CustomerStatus.Active,
-    });
-
-    console.log(
-      `Successfully created custom timeline entry ${entry.id} for customer ${customer.id}`
-    );
+    if (data.issue) {
+      await createIssue({
+        customerId: customer.id,
+        issueTypeId: getIssueTypeId(data.issue),
+        priorityValue:
+          data.issue.priority === 'urgent'
+            ? 0
+            : data.issue.priority === 'high'
+            ? 1
+            : data.issue.priority === 'normal'
+            ? 2
+            : 3,
+      });
+    }
 
     return res.status(200).json({ error: null });
   } catch (err) {

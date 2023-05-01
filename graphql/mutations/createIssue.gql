@@ -1,0 +1,17 @@
+mutation createIssue($input: CreateIssueInput!) {
+  createIssue(input: $input) {
+    issue {
+      id
+    }
+    error {
+      message
+      type
+      code
+      fields {
+        field
+        message
+        type
+      }
+    }
+  }
+}

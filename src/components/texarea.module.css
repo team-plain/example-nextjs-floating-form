@@ -1,0 +1,30 @@
+.textarea {
+    box-shadow: 0 0 0 1px #0a0a2e29 inset, 0 1px 1px #0a0a0b0f;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #25252d;
+    outline: none;
+    border: none;
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    line-height: 24px;
+    resize: vertical;
+}
+
+.textarea::placeholder {
+    --tw-text-opacity: 1;
+    color: rgb(108 108 132 / var(--tw-text-opacity));
+}
+
+.textarea:hover {
+    box-shadow: 0 0 0 1px #0a0a2e3d inset, 0 1px 1px #0a0a0b0f;
+}
+
+.textarea:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000);
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(112 71 235 / var(--tw-ring-opacity));
+}

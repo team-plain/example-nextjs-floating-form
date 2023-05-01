@@ -1,0 +1,27 @@
+.button {
+    padding: 8px 16px;
+    font-weight: 500;
+    --tw-bg-opacity: 1;
+    background-color: rgb(112 71 235 / var(--tw-bg-opacity));
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity));
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    display: block;
+    width: 100%;
+    line-height: 24px;
+}
+
+.button:not(:disabled) {
+    cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(126 89 237 / var(--tw-bg-opacity));
+}
+
+.button:disabled {
+    opacity: 0.8;
+}
