@@ -66,6 +66,12 @@ async function request<Query, Variables>(args: {
  * This creates or updates a customer and returns the full customer.
  */
 async function upsertCustomer(inputs: { email: string; fullName: string }) {
+  const groupKeysString = process.env.PLAIN_CUSTOMER_GROUP_KEYS || '';
+  const groupKeys = groupKeysString.split(',').map((s) => s.trim());
+  const randomGroupKey = groupKeys.length
+    ? groupKeys[Math.floor(Math.random() * groupKeys.length)]
+    : null;
+
   const res = await request({
     query: UpsertCustomerDocument,
     variables: {
@@ -79,6 +85,13 @@ async function upsertCustomer(inputs: { email: string; fullName: string }) {
             email: inputs.email,
             isVerified: false,
           },
+          customerGroupIdentifiers: randomGroupKey
+            ? [
+                {
+                  customerGroupKey: randomGroupKey,
+                },
+              ]
+            : undefined,
         },
         onUpdate: {},
       },
