@@ -29,6 +29,7 @@
 }
 
 .content {
+    z-index: 1;
     width: var(--radix-select-trigger-width);
     margin: 0;
     border-radius: 8px;

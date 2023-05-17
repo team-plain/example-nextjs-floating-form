@@ -22,15 +22,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.wrapper}>
-        <div className={styles.titleColumn}>
-          <span className={styles.preTitle}>COntact us</span>
-          <h1 className={styles.title}>Let us help.</h1>
-          <p className={styles.paragraph}>
-            Our team is here to make your experience as good as possible. Don&apos;t hesitate to
-            reach out about anything we can do.
-          </p>
-          <p className={styles.paragraph}>What&apos;s on your mind?</p>
-        </div>
+        <div className={styles.titleColumn}>hello</div>
         <div className={styles.formColumn}>
           <ContactForm
             key={key}

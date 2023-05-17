@@ -13,6 +13,7 @@ export function TextInput(props: TextInputProps) {
       className={styles.input}
       placeholder={props.placeholder}
       value={props.value}
+      required={true}
       onChange={(e) => {
         props.onChange(e.currentTarget.value);
       }}

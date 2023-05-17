@@ -6,8 +6,17 @@ import styles from './contactForm.module.css';
 import { Textarea } from './textarea';
 import { Checkbox } from './checkbox';
 import { Button } from './button';
-import { ContactFormPayload } from '../contactFormTypes';
-import { useContactForm } from '../useContactForm';
+
+import _ from 'lodash';
+
+import { UAParser } from 'ua-parser-js';
+import { toast } from 'react-hot-toast';
+import {
+  ComponentSpacerSize,
+  ComponentTextColor,
+  ComponentTextSize,
+} from '@team-plain/typescript-sdk';
+import { RequestBody } from '../../pages/api/contact-form';
 
 const formOptions = [
   {
@@ -18,10 +27,9 @@ const formOptions = [
     label: 'Book a demo',
     value: 'demo' as const,
   },
-
   {
-    label: 'Request a refund',
-    value: 'refund' as const,
+    label: 'Suggest a feature',
+    value: 'feature' as const,
   },
   {
     label: 'Report a security issue',
@@ -34,37 +42,40 @@ const formOptions = [
 ];
 
 const demoCurrentProviderOptions = [
-  { label: 'Gumroad', value: 'gumroad' as const },
-  { label: 'Stripe', value: 'stripe' as const },
-  { label: 'Paddle', value: 'paddle' as const },
+  { label: 'Acme', value: 'acme' as const },
+  { label: 'Juniper', value: 'juniper' as const },
+  { label: 'Resolve', value: 'resolve' as const },
   { label: 'Other', value: 'other' as const },
   { label: 'No, setting up for the first time', value: 'none' as const },
 ];
 
-const demoExpectedTransactionVolumeOptions = [
+const demoExpectedVolumeOptions = [
   { label: 'I would rather not say', value: 'no' as const },
-  { label: 'Up to $500/month', value: '<$500' as const },
-  { label: 'Up to $10,000/month', value: '<$10,000' as const },
-  { label: 'Up to $50,000/month', value: '<$50,000' as const },
-  { label: 'More than $50,000/month', value: '>$50,000' as const },
+  { label: 'Up to 500/month', value: '<500' as const },
+  { label: 'Up to 10,000/month', value: '<10,000' as const },
+  { label: 'Up to 50,000/month', value: '<50,000' as const },
+  { label: 'More than 50,000/month', value: '>50,000' as const },
 ];
 
 export function ContactForm(props: { onSuccess: () => void }) {
-  const { submit, status, reset } = useContactForm();
+  const [status, setStatus] = useState<'unknown' | 'loading' | 'success' | 'error'>('unknown');
 
   const [form, setForm] = useState<(typeof formOptions)[number]['value'] | null>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setFullName] = useState('Grace');
+  const [email, setEmailAddress] = useState('grace@gmail.com');
 
   // Bug form
   const [bugDescription, setBugDescription] = useState('');
   const [bugIsBlocking, setBugIsBlocking] = useState(false);
 
+  // Feature request
+  const [featureRequest, setFeatureRequest] = useState('');
+
   // Demo form
-  const [demoCurrentProvider, setDemoCurrentProvider] = useState<string | null>(null);
-  const [demoTransactionValue, setDemoTransactionValue] = useState<
-    (typeof demoExpectedTransactionVolumeOptions)[number]['value'] | null
-  >(null);
+  const [demoCurrentProvider, setDemoCurrentProvider] = useState<string>('');
+  const [demoExpectedVolume, setDemoExpectedVolume] = useState<
+    (typeof demoExpectedVolumeOptions)[number]['value']
+  >(demoExpectedVolumeOptions[0].value);
   const [demoMessage, setDemoMessage] = useState('');
 
   // Question
@@ -73,121 +84,205 @@ export function ContactForm(props: { onSuccess: () => void }) {
   // Security
   const [securityIssue, setSecurityIssue] = useState('');
 
-  function createContactFormPayload(): ContactFormPayload | null {
-    if (!form || form === 'refund') {
-      return null;
+  function getCustomTimelineEntry(): RequestBody['customeTimelineEntry'] {
+    if (!form) {
+      throw new Error('form not set');
     }
-
-    const commonFields = { name, email };
 
     switch (form) {
       case 'bug': {
+        const parser = new UAParser(window.navigator.userAgent);
+        const browser = parser.getBrowser();
         return {
-          ...commonFields,
           title: 'Bug report',
-          fields: [
+          components: [
             {
-              type: 'text',
-              text: bugDescription,
+              componentText: {
+                text: bugDescription,
+              },
+            },
+            {
+              componentSpacer: {
+                spacerSize: ComponentSpacerSize.S,
+              },
+            },
+            {
+              componentText: {
+                text: `Reported on ${window.location.href} using ${browser.name} (${browser.version})`,
+                textSize: ComponentTextSize.S,
+                textColor: ComponentTextColor.Muted,
+              },
             },
           ],
-          issue: {
-            issueType: 'bug',
-            priority: bugIsBlocking ? 'high' : 'normal',
-          },
         };
       }
-      case 'demo': {
+      case 'feature': {
         return {
-          ...commonFields,
-          title: 'Demo request',
-          fields: [
+          title: 'Feature request',
+          components: [
             {
-              type: 'key-value',
-              label: 'Currently',
-              value:
-                demoCurrentProviderOptions.find((o) => o.value === demoCurrentProvider)?.label ||
-                '',
-            },
-            {
-              type: 'spacer',
-              size: 's',
-            },
-            {
-              type: 'key-value',
-              label: 'Expected transaction volume',
-              value:
-                demoExpectedTransactionVolumeOptions.find((o) => o.value === demoTransactionValue)
-                  ?.label || '',
-            },
-            {
-              type: 'spacer',
-              size: 'm',
-            },
-            {
-              type: 'key-value',
-              label: 'Additional message:',
-              orientation: 'vertical',
-              value: demoMessage,
+              componentText: {
+                text: featureRequest,
+              },
             },
           ],
-          issue: {
-            issueType: 'demo',
-            priority: 'high',
-          },
-        };
-      }
-      case 'security': {
-        return {
-          ...commonFields,
-          title: 'Security issue report',
-          fields: [
-            {
-              type: 'text',
-              text: securityIssue,
-            },
-          ],
-          issue: {
-            issueType: 'security',
-            priority: 'urgent',
-          },
         };
       }
       case 'question': {
         return {
-          ...commonFields,
           title: 'General question',
-          fields: [
+          components: [
             {
-              type: 'text',
-              text: question,
+              componentText: {
+                text: question,
+              },
             },
           ],
-          issue: null,
+        };
+      }
+      case 'security': {
+        return {
+          title: 'Security report',
+          components: [
+            {
+              componentText: {
+                text: securityIssue,
+              },
+            },
+          ],
+        };
+      }
+      case 'demo': {
+        return {
+          title: 'Demo request',
+          components: [
+            ...(demoMessage
+              ? [
+                  {
+                    componentText: {
+                      text: demoMessage,
+                    },
+                  },
+                  {
+                    componentSpacer: {
+                      spacerSize: ComponentSpacerSize.S,
+                    },
+                  },
+                ]
+              : []),
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Current provider',
+                      color: ComponentTextColor.Muted,
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text:
+                        demoCurrentProviderOptions.find((o) => o.value === demoCurrentProvider)
+                          ?.label || '',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Expected volume',
+                      color: ComponentTextColor.Muted,
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text:
+                        demoExpectedVolumeOptions.find((o) => o.value === demoExpectedVolume)
+                          ?.label || '',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
         };
       }
     }
   }
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const payload = createContactFormPayload();
+  function getIssue(): RequestBody['issue'] {
+    if (!form) {
+      throw new Error('form not set');
+    }
+    const issueTypeIds = {
+      bug: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_BUG || '',
+      demo: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_DEMO || '',
+      feature: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_FEATURE || '',
+      security: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_SECURITY || '',
+      question: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_QUESTION || '',
+    } as const;
 
-    if (!payload) {
-      return;
+    const issueTypeId = issueTypeIds[form];
+
+    if (!issueTypeId) {
+      throw new Error(`No issue type id defined for form "${form}"`);
     }
 
-    submit(payload);
+    return {
+      issueTypeId,
+      // In this example contact form if an issue is blocking the user than we want
+      // to make sure the created issue is urgent. Otherwise we're ok with the default
+      // which is set per issue type in the Plain settings.
+      priority: form === 'bug' && bugIsBlocking ? 1 : null,
+    };
   }
 
-  const { onSuccess } = props;
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus('loading');
+
+    const body: RequestBody = {
+      customer: {
+        name,
+        email,
+      },
+      customeTimelineEntry: getCustomTimelineEntry(),
+      issue: getIssue(),
+    };
+
+    fetch('/api/contact-form/', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          setStatus('error');
+        } else {
+          setStatus('success');
+        }
+      })
+      .catch(function (error) {
+        console.error(error);
+        setStatus('error');
+      });
+  }
 
   useEffect(() => {
     if (status === 'success') {
-      reset();
-      onSuccess();
+      toast.success('Nice!');
     }
-  }, [status, reset, onSuccess]);
+    if (status === 'error') {
+      toast.error('Oops');
+    }
+  }, [status]);
 
   return (
     <div>
@@ -199,10 +294,14 @@ export function ContactForm(props: { onSuccess: () => void }) {
       <form className={styles.form} onSubmit={onSubmit}>
         <div className={styles.basicDetails}>
           <FormField label="Your name">
-            <TextInput value={name} onChange={setName} placeholder="e.g. Grace Hoppper" />
+            <TextInput value={name} onChange={setFullName} placeholder="e.g. Grace Hoppper" />
           </FormField>
           <FormField label="Your email">
-            <TextInput value={email} onChange={setEmail} placeholder="e.g. grace@nasa.gov.uk" />
+            <TextInput
+              value={email}
+              onChange={setEmailAddress}
+              placeholder="e.g. grace@nasa.gov.uk"
+            />
           </FormField>
         </div>
         <FormField label="What do you need help with?">
@@ -223,12 +322,12 @@ export function ContactForm(props: { onSuccess: () => void }) {
               <Textarea
                 value={bugDescription}
                 onChange={setBugDescription}
-                placeholder="e.g. grace@nasa.gov.uk"
+                placeholder="When I..."
               />
             </FormField>
             <FormField label="Is this really bad?">
               <Checkbox
-                label="Yes, this is preventing me from accepting payments or getting paid."
+                label="Yes, this is preventing me from using Liveblocks."
                 isChecked={bugIsBlocking}
                 onChange={setBugIsBlocking}
               />
@@ -238,20 +337,20 @@ export function ContactForm(props: { onSuccess: () => void }) {
 
         {form === 'demo' && (
           <>
-            <FormField label="Are you currently using a payment provider?">
+            <FormField label="Are you currently using another provider?">
               <SelectInput
                 options={demoCurrentProviderOptions}
                 value={demoCurrentProvider}
-                placeholder="Current payment provider"
+                placeholder="Current provider"
                 onChange={setDemoCurrentProvider}
               />
             </FormField>
-            <FormField label="What transaction volume are you expecting">
+            <FormField label="How many API calls do you think expect to make?">
               <SelectInput
                 placeholder="Expected transaction volume"
-                options={demoExpectedTransactionVolumeOptions}
-                value={demoTransactionValue}
-                onChange={setDemoTransactionValue}
+                options={demoExpectedVolumeOptions}
+                value={demoExpectedVolume}
+                onChange={setDemoExpectedVolume}
               />
             </FormField>
             <FormField
@@ -279,17 +378,15 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        {form === 'refund' && (
+        {form === 'feature' && (
           <>
-            <p className={styles.paragraph}>
-              Lemon Squeezy is a payment platform used by many different merchants to sell digital
-              goods.
-            </p>
-            <p className={styles.paragraph}>
-              We allow all sellers to refund their own purchases but do not make that decision for
-              them. If you think you deserve a refund please get in touch with the store you
-              purchased from.
-            </p>
+            <FormField label="What's your idea?">
+              <Textarea
+                value={featureRequest}
+                onChange={setFeatureRequest}
+                placeholder="It would be great if…"
+              />
+            </FormField>
           </>
         )}
 
@@ -299,23 +396,17 @@ export function ContactForm(props: { onSuccess: () => void }) {
               label="What did you find?"
               helpText="We will get back to you, at the latest, in 48 hours."
             >
-              <Textarea
-                value={securityIssue}
-                onChange={setSecurityIssue}
-                placeholder="e.g. grace@nasa.gov.uk"
-              />
+              <Textarea value={securityIssue} onChange={setSecurityIssue} placeholder="When I…" />
             </FormField>
           </>
         )}
 
-        {form !== 'refund' && (
-          <Button
-            label="Submit"
-            onClick={() => {}}
-            isLoading={false}
-            isDisabled={status === 'loading'}
-          />
-        )}
+        <Button
+          label="Submit"
+          onClick={() => {}}
+          isLoading={false}
+          isDisabled={status === 'loading' || !form}
+        />
       </form>
     </div>
   );
