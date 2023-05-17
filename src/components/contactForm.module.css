@@ -10,8 +10,7 @@
 
 .description {
     line-height: 1.5;
-    --tw-text-opacity: 1;
-    color: rgb(108 108 132 / var(--tw-text-opacity));
+    color: var(--textColorMuted);
 }
 
 .paragraph {
@@ -28,5 +27,6 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 24px
+    gap: 24px;
+    width: 500px;
 }

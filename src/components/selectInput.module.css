@@ -1,9 +1,10 @@
 .select {
-    box-shadow: 0 0 0 1px #0a0a2e29 inset, 0 1px 1px #0a0a0b0f;
+    box-shadow: var(--inputBoxShadow);
+    background: var(--inputBackground);
+    color: var(--textColor);
     width: 100%;
     display: flex;
     align-items: center;
-    background: #FFF;
     outline: none;
     border: none;
     padding: 8px 16px;
@@ -13,15 +14,11 @@
 }
 
 .select:hover {
-    box-shadow: 0 0 0 1px #0a0a2e3d inset, 0 1px 1px #0a0a0b0f;
+    box-shadow: var(--inputBoxShadowHover);
 }
 
 .select:focus {
-    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-    box-shadow: var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000);
-    --tw-ring-opacity: 1;
-    --tw-ring-color: rgb(112 71 235 / var(--tw-ring-opacity));    
+    box-shadow: var(--inputBoxShadowFocus);
 }
 
 .icon {
@@ -33,20 +30,15 @@
     width: var(--radix-select-trigger-width);
     margin: 0;
     border-radius: 8px;
-    border-width: 0px;
-    
-    --tw-bg-opacity: 1;
-    background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-    padding: 8px 0;
-
-    --tw-shadow: 0px 0px 0px 1px rgba(18, 18, 23, .1), 0px 24px 48px rgba(18, 18, 23, .03), 0px 10px 18px rgba(18, 18, 23, .03), 0px 5px 8px rgba(18, 18, 23, .04), 0px 2px 4px rgba(18, 18, 23, .0399338);
-    --tw-shadow-colored: 0px 0px 0px 1px var(--tw-shadow-color), 0px 24px 48px var(--tw-shadow-color), 0px 10px 18px var(--tw-shadow-color), 0px 5px 8px var(--tw-shadow-color), 0px 2px 4px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow);
+    border-width: 0px;    
+    background: var(--inputBackground);
+    color: var(--textColor);
+    padding: 8px 0;   
+    box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.1);
 }
 
 .select[data-placeholder] {
-    --tw-text-opacity: 1;
-    color: rgb(108 108 132 / var(--tw-text-opacity));
+    color: var(--textColorMuted);
 }
 
 .item {
@@ -56,5 +48,6 @@
 }
 
 .item:focus {
-    background: rgb(247 247 248 / 1)
+    background: rgba(255,255,255, 0.05);
+    color: var(--textColor);
 }

@@ -12,12 +12,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.wrapper}>
-        <div className={styles.titleColumn}>hello</div>
-        <div className={styles.formColumn}>
-          <ContactForm />
-        </div>
-      </main>
+      <ContactForm />
     </>
   );
 };

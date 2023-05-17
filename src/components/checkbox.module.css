@@ -4,22 +4,26 @@
 }
 
 .checkbox {
+  box-shadow: var(--inputBoxShadow);
+  color: var(--textColor);
+  background: var(--inputBackground);
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 1px #0a0a2e29 inset, 0 1px 1px #0a0a0b0f;
   border-radius: 6px;
-  background: #fff;
   outline: none;
   border: none;
   cursor: pointer;
   margin-right: 8px;
 }
 
+.checkbox:hover {
+  box-shadow: var(--inputBoxShadowHover);
+}
+
 .checkbox[data-state="checked"] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(112 71 235 / var(--tw-bg-opacity));
+  background: var(--inputBackgroundSelected);
   color: #FFF;
 }

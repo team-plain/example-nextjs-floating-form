@@ -8,7 +8,6 @@
 
 .helpText {
     margin-bottom: 12px;
-    --tw-text-opacity: 1;
-    color: rgb(108 108 132 / var(--tw-text-opacity));
+    color: var(--textColorMuted);
     display: block;
 }
