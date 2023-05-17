@@ -9,14 +9,16 @@ import { Button } from './button';
 
 import _ from 'lodash';
 
-import { UAParser } from 'ua-parser-js';
 import { toast } from 'react-hot-toast';
-import {
-  ComponentSpacerSize,
-  ComponentTextColor,
-  ComponentTextSize,
-} from '@team-plain/typescript-sdk';
 import { RequestBody } from '../../pages/api/contact-form';
+import {
+  customTimelineEntryForBug,
+  customTimelineEntryForDemo,
+  customTimelineEntryForFeatureRequest,
+  customTimelineEntryForQuestion,
+  customTimelineEntryForSecurityReport,
+} from '../custom-timeline-entry';
+import { getIssue } from '../issue';
 
 const formOptions = [
   {
@@ -50,19 +52,19 @@ const demoCurrentProviderOptions = [
 ];
 
 const demoExpectedVolumeOptions = [
-  { label: 'I would rather not say', value: 'no' as const },
+  { label: "I'm not sure", value: 'no' as const },
   { label: 'Up to 500/month', value: '<500' as const },
   { label: 'Up to 10,000/month', value: '<10,000' as const },
   { label: 'Up to 50,000/month', value: '<50,000' as const },
   { label: 'More than 50,000/month', value: '>50,000' as const },
 ];
 
-export function ContactForm(props: { onSuccess: () => void }) {
-  const [status, setStatus] = useState<'unknown' | 'loading' | 'success' | 'error'>('unknown');
+export type FormType = (typeof formOptions)[number]['value'] | null;
 
-  const [form, setForm] = useState<(typeof formOptions)[number]['value'] | null>(null);
-  const [name, setFullName] = useState('Grace');
-  const [email, setEmailAddress] = useState('grace@gmail.com');
+export function ContactForm() {
+  const [formType, setFormType] = useState<FormType>(null);
+  const [name, setFullName] = useState('');
+  const [email, setEmailAddress] = useState('');
 
   // Bug form
   const [bugDescription, setBugDescription] = useState('');
@@ -84,170 +86,51 @@ export function ContactForm(props: { onSuccess: () => void }) {
   // Security
   const [securityIssue, setSecurityIssue] = useState('');
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  function clearForm() {
+    setFormType(null);
+
+    setFullName('');
+    setEmailAddress('');
+    setBugDescription('');
+    setBugIsBlocking(false);
+    setFeatureRequest('');
+    setDemoCurrentProvider('');
+    setDemoExpectedVolume(demoExpectedVolumeOptions[0].value);
+    setDemoMessage('');
+    setQuestion('');
+    setSecurityIssue('');
+
+    setIsProcessing(false);
+  }
+
   function getCustomTimelineEntry(): RequestBody['customeTimelineEntry'] {
-    if (!form) {
+    if (!formType) {
       throw new Error('form not set');
     }
 
-    switch (form) {
-      case 'bug': {
-        const parser = new UAParser(window.navigator.userAgent);
-        const browser = parser.getBrowser();
-        return {
-          title: 'Bug report',
-          components: [
-            {
-              componentText: {
-                text: bugDescription,
-              },
-            },
-            {
-              componentSpacer: {
-                spacerSize: ComponentSpacerSize.S,
-              },
-            },
-            {
-              componentText: {
-                text: `Reported on ${window.location.href} using ${browser.name} (${browser.version})`,
-                textSize: ComponentTextSize.S,
-                textColor: ComponentTextColor.Muted,
-              },
-            },
-          ],
-        };
-      }
-      case 'feature': {
-        return {
-          title: 'Feature request',
-          components: [
-            {
-              componentText: {
-                text: featureRequest,
-              },
-            },
-          ],
-        };
-      }
-      case 'question': {
-        return {
-          title: 'General question',
-          components: [
-            {
-              componentText: {
-                text: question,
-              },
-            },
-          ],
-        };
-      }
-      case 'security': {
-        return {
-          title: 'Security report',
-          components: [
-            {
-              componentText: {
-                text: securityIssue,
-              },
-            },
-          ],
-        };
-      }
-      case 'demo': {
-        return {
-          title: 'Demo request',
-          components: [
-            ...(demoMessage
-              ? [
-                  {
-                    componentText: {
-                      text: demoMessage,
-                    },
-                  },
-                  {
-                    componentSpacer: {
-                      spacerSize: ComponentSpacerSize.S,
-                    },
-                  },
-                ]
-              : []),
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Current provider',
-                      color: ComponentTextColor.Muted,
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text:
-                        demoCurrentProviderOptions.find((o) => o.value === demoCurrentProvider)
-                          ?.label || '',
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Expected volume',
-                      color: ComponentTextColor.Muted,
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text:
-                        demoExpectedVolumeOptions.find((o) => o.value === demoExpectedVolume)
-                          ?.label || '',
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        };
-      }
+    switch (formType) {
+      case 'bug':
+        return customTimelineEntryForBug(bugDescription);
+      case 'feature':
+        return customTimelineEntryForFeatureRequest(featureRequest);
+      case 'question':
+        return customTimelineEntryForQuestion(question);
+      case 'security':
+        return customTimelineEntryForSecurityReport(securityIssue);
+      case 'demo':
+        return customTimelineEntryForDemo(
+          demoMessage,
+          demoCurrentProviderOptions.find((o) => o.value === demoCurrentProvider)?.label || '',
+          demoExpectedVolumeOptions.find((o) => o.value === demoExpectedVolume)?.label || ''
+        );
     }
   }
 
-  function getIssue(): RequestBody['issue'] {
-    if (!form) {
-      throw new Error('form not set');
-    }
-    const issueTypeIds = {
-      bug: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_BUG || '',
-      demo: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_DEMO || '',
-      feature: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_FEATURE || '',
-      security: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_SECURITY || '',
-      question: process.env.NEXT_PUBLIC_PLAIN_ISSUE_TYPE_ID_QUESTION || '',
-    } as const;
-
-    const issueTypeId = issueTypeIds[form];
-
-    if (!issueTypeId) {
-      throw new Error(`No issue type id defined for form "${form}"`);
-    }
-
-    return {
-      issueTypeId,
-      // In this example contact form if an issue is blocking the user than we want
-      // to make sure the created issue is urgent. Otherwise we're ok with the default
-      // which is set per issue type in the Plain settings.
-      priority: form === 'bug' && bugIsBlocking ? 1 : null,
-    };
-  }
-
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus('loading');
+    setIsProcessing(true);
 
     const body: RequestBody = {
       customer: {
@@ -255,34 +138,27 @@ export function ContactForm(props: { onSuccess: () => void }) {
         email,
       },
       customeTimelineEntry: getCustomTimelineEntry(),
-      issue: getIssue(),
+      issue: getIssue(formType, bugIsBlocking),
     };
 
-    fetch('/api/contact-form/', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          setStatus('error');
-        } else {
-          setStatus('success');
-        }
-      })
-      .catch(function (error) {
-        console.error(error);
-        setStatus('error');
+    try {
+      const result = await fetch('/api/contact-form/', {
+        method: 'POST',
+        body: JSON.stringify(body),
       });
-  }
-
-  useEffect(() => {
-    if (status === 'success') {
-      toast.success('Nice!');
-    }
-    if (status === 'error') {
+      if (result.ok) {
+        clearForm();
+        toast.success('Success!');
+      } else {
+        toast.error('Oops');
+      }
+    } catch (error) {
+      console.error(error);
       toast.error('Oops');
     }
-  }, [status]);
+
+    setIsProcessing(false);
+  }
 
   return (
     <div>
@@ -294,26 +170,26 @@ export function ContactForm(props: { onSuccess: () => void }) {
       <form className={styles.form} onSubmit={onSubmit}>
         <div className={styles.basicDetails}>
           <FormField label="Your name">
-            <TextInput value={name} onChange={setFullName} placeholder="e.g. Grace Hoppper" />
+            <TextInput value={name} onChange={setFullName} placeholder="e.g. Simon Rohrbach" />
           </FormField>
           <FormField label="Your email">
             <TextInput
               value={email}
               onChange={setEmailAddress}
-              placeholder="e.g. grace@nasa.gov.uk"
+              placeholder="e.g. simon@getresolve.io"
             />
           </FormField>
         </div>
         <FormField label="What do you need help with?">
           <SelectInput
             options={formOptions}
-            onChange={setForm}
-            value={form}
+            onChange={setFormType}
+            value={formType}
             placeholder="What you need help with"
           />
         </FormField>
 
-        {form === 'bug' && (
+        {formType === 'bug' && (
           <>
             <FormField
               label="What did you find?"
@@ -327,7 +203,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
             </FormField>
             <FormField label="Is this really bad?">
               <Checkbox
-                label="Yes, this is preventing me from using Liveblocks."
+                label="Yes, this is preventing me from using this software."
                 isChecked={bugIsBlocking}
                 onChange={setBugIsBlocking}
               />
@@ -335,7 +211,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        {form === 'demo' && (
+        {formType === 'demo' && (
           <>
             <FormField label="Are you currently using another provider?">
               <SelectInput
@@ -366,7 +242,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        {form === 'question' && (
+        {formType === 'question' && (
           <>
             <FormField label="What's on your mind?">
               <Textarea
@@ -378,7 +254,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        {form === 'feature' && (
+        {formType === 'feature' && (
           <>
             <FormField label="What's your idea?">
               <Textarea
@@ -390,7 +266,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        {form === 'security' && (
+        {formType === 'security' && (
           <>
             <FormField
               label="What did you find?"
@@ -401,12 +277,7 @@ export function ContactForm(props: { onSuccess: () => void }) {
           </>
         )}
 
-        <Button
-          label="Submit"
-          onClick={() => {}}
-          isLoading={false}
-          isDisabled={status === 'loading' || !form}
-        />
+        <Button label="Submit" isLoading={false} isDisabled={isProcessing || !formType} />
       </form>
     </div>
   );

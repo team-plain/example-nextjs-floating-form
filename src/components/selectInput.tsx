@@ -1,6 +1,7 @@
 import * as Select from '@radix-ui/react-select';
 import styles from './selectInput.module.css';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
+import { useEffect, useState } from 'react';
 
 export type SelectOption<T extends string> = {
   label: string;
@@ -15,8 +16,18 @@ export interface SelectProps<T extends string> {
 }
 
 export function SelectInput<T extends string>(props: SelectProps<T>) {
+  // Key is to fix bug with radix-ui/react-select
+  // https://github.com/radix-ui/primitives/issues/1569
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    if (props.value === null) {
+      setKey((k) => k + 1);
+    }
+  }, [props.value]);
+
   return (
-    <Select.Root value={props.value || undefined} onValueChange={props.onChange}>
+    <Select.Root key={key} value={props.value || undefined} onValueChange={props.onChange}>
       <Select.Trigger className={styles.select}>
         <Select.Value placeholder={props.placeholder} />
         <Select.Icon className={styles.icon}>

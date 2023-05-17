@@ -1,18 +1,9 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useState } from 'react';
 import { ContactForm } from '../src/components/contactForm';
 import styles from '../styles/pages/index.module.css';
-import toast from 'react-hot-toast';
 
 const Home: NextPage = () => {
-  const [key, setKey] = useState(1);
-
-  const notify = () =>
-    toast.success("Got it, we're on it", {
-      icon: '👌',
-    });
-
   return (
     <>
       <Head>
@@ -24,13 +15,7 @@ const Home: NextPage = () => {
       <main className={styles.wrapper}>
         <div className={styles.titleColumn}>hello</div>
         <div className={styles.formColumn}>
-          <ContactForm
-            key={key}
-            onSuccess={() => {
-              setKey(key + 1);
-              notify();
-            }}
-          />
+          <ContactForm />
         </div>
       </main>
     </>

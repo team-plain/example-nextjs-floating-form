@@ -1,3 +1,4 @@
+import { inspect } from 'util';
 import { PlainClient, UpsertCustomTimelineEntryInput } from '@team-plain/typescript-sdk';
 import _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -60,7 +61,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   });
 
   if (upsertCustomerRes.error) {
-    console.error(upsertCustomerRes.error);
+    console.error(
+      inspect(upsertCustomerRes.error, { showHidden: false, depth: null, colors: true })
+    );
     return res.status(500).json({ error: upsertCustomerRes.error.message });
   }
 
@@ -74,7 +77,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   });
 
   if (upsertTimelineEntryRes.error) {
-    console.error(upsertTimelineEntryRes.error);
+    console.error(
+      inspect(upsertTimelineEntryRes.error, { showHidden: false, depth: null, colors: true })
+    );
     return res.status(500).json({ error: upsertTimelineEntryRes.error.message });
   }
 
@@ -87,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   });
 
   if (createIssueRes.error) {
+    console.error(inspect(createIssueRes.error, { showHidden: false, depth: null, colors: true }));
     return res.status(500).json({ error: createIssueRes.error.message });
   }
 
