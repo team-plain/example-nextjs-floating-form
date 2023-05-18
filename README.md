@@ -16,6 +16,11 @@ This is meant as a starting point that you can customise to specifically fit you
 
 ![Screenshot of demo](./screenshot.png)
 
+### Interesting files:
+
+- The API route: [./pages/api/contact-form.ts](./pages/api/contact-form.ts)
+- The contact form react component: [./src/components/contactForm.tsx](./src/components/contactForm.tsx)
+
 ### Running the example:
 
 You will need an API key from Plain first. [Check out our docs](https://docs.plain.com/core-api/authentication) on how to generate an API key.
