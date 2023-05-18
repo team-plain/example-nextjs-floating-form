@@ -1,12 +1,14 @@
 # Example NextJS Contact Form
 
-This NextJS app shows how to build a contact form using Plain's [Custom Timeline Entries](https://docs.plain.com/recipes/custom-timeline-entry-upsert) and Plain's [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk)
+This NextJS app shows how to build a contact form using Plain's [Custom Timeline Entries](https://docs.plain.com/recipes/custom-timeline-entry-upsert) and [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk).
 
 This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/api-routes/introduction) (`/api/contact-form.tsx`) which calls the Plain API to:
 
 - Create the customer within Plain if they don't exist
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Open an issue with the right priority
+
+This is meant as a starting point that you can customise to specifically fit your product and needs.
 
 ![Screenshot of demo](./screenshot.png)
 
