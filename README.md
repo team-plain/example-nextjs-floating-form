@@ -23,8 +23,9 @@ For this demo you will need to grant the API key the following permissions:
 - `customer:create`
 - `customer:edit`
 - `customer:read`
-- `issues:create`
-- `issues:read`
+- `issue:create`
+- `issue:read`
+- `issueType:read`
 
 You will then have to create a few issue types in settings and copy their IDs. This example assumes you have an issue type for bugs, demo request, feature suggestions, security reports and general questions.
 
