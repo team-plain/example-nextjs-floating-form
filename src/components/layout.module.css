@@ -1,0 +1,62 @@
+
+
+
+.layout {
+    --sidebarWidth: 450px;
+    --contentPadding: 42px;
+    --contentWidth: 900px;
+    --borderColor: #cdccda1f;
+
+    display: grid;
+    grid-template-columns: 1fr var(--sidebarWidth);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.header {
+    border-bottom: 1px solid var(--borderColor);
+}
+
+.title {
+    font-weight: 500;
+    font-size: 16px;
+    padding: 16px 24px;
+}
+
+.main {
+    background-color: var(--background); /* Must match SVG */
+    background-image: url('/images/background.svg');
+    background-size: 900px;
+    background-repeat: no-repeat;
+    background-position: center var(--contentPadding);
+    position: relative;
+}
+
+.main::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* This must match the above defined CSS variables. */
+/* We can't use our CSS variables here since they are not available in media queries */
+@media screen and (max-width: calc(450px + 42px * 2 + 900px)) {
+    .main {
+        background-position: var(--contentPadding) var(--contentPadding);
+    }
+}
+
+.aside {
+    border-left: 1px solid var(--borderColor);
+    overflow-y: auto;
+}
+
+.asideContent {
+    padding: 24px;
+}

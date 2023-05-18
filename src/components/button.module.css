@@ -1,16 +1,16 @@
 .button {
     padding: 8px 16px;
     font-weight: 500;
-    --tw-bg-opacity: 1;
-    background-color: rgb(112 71 235 / var(--tw-bg-opacity));
-    --tw-text-opacity: 1;
-    color: rgb(255 255 255 / var(--tw-text-opacity));
+    background: #4747eb;
+    color: var(--textColor);
     border-radius: 8px;
     outline: none;
     border: none;
     display: block;
-    width: 100%;
+    max-width: 180px;
     line-height: 24px;
+    transition: background 150ms linear;
+    position: relative;
 }
 
 .button:not(:disabled) {
@@ -18,10 +18,38 @@
 }
 
 .button:hover:not(:disabled) {
-    --tw-bg-opacity: 1;
-    background-color: rgb(126 89 237 / var(--tw-bg-opacity));
+    background: #5050f0;
 }
 
 .button:disabled {
-    opacity: 0.8;
+    background: #cdccda1f;
+    color: #7f7e80;
 }
+
+
+.spinner {
+    --size: 18px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--size);
+    height: var(--size);
+    border: 2px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: translate3d(-50%, -50%, 0) rotate(0deg);
+    }
+    70% {
+        transform: translate3d(-50%, -50%, 0) rotate(200deg);
+    }
+    100% {
+        transform: translate3d(-50%, -50%, 0) rotate(360deg);
+    }
+} 

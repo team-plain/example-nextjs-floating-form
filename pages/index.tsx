@@ -2,6 +2,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { ContactForm } from '../src/components/contactForm';
 import styles from '../styles/pages/index.module.css';
+import { Layout } from '../src/components/layout';
 
 const Home: NextPage = () => {
   return (
@@ -12,7 +13,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <ContactForm />
+      <Layout>
+        <ContactForm />
+      </Layout>
     </>
   );
 };

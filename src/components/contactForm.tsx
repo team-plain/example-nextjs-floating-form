@@ -7,8 +7,6 @@ import { Textarea } from './textarea';
 import { Checkbox } from './checkbox';
 import { Button } from './button';
 
-import _ from 'lodash';
-
 import { toast } from 'react-hot-toast';
 import { RequestBody } from '../../pages/api/contact-form';
 import {
@@ -161,124 +159,108 @@ export function ContactForm() {
   }
 
   return (
-    <div>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Get in touch</h2>
-        <p className={styles.description}>We do are best to get back to you in 24h.</p>
+    <form className={styles.form} onSubmit={onSubmit}>
+      <div className={styles.basicDetails}>
+        <FormField label="Your name">
+          <TextInput value={name} onChange={setFullName} placeholder="e.g. Grace Hopper" />
+        </FormField>
+        <FormField label="Your email">
+          <TextInput value={email} onChange={setEmailAddress} placeholder="e.g. grace@gmail.com" />
+        </FormField>
       </div>
+      <FormField label="What do you need help with?">
+        <SelectInput
+          options={formOptions}
+          onChange={setFormType}
+          value={formType}
+          placeholder="What you need help with"
+        />
+      </FormField>
 
-      <form className={styles.form} onSubmit={onSubmit}>
-        <div className={styles.basicDetails}>
-          <FormField label="Your name">
-            <TextInput value={name} onChange={setFullName} placeholder="e.g. Simon Rohrbach" />
+      {formType === 'bug' && (
+        <>
+          <FormField
+            label="What did you find?"
+            helpText="The more descriptive the better. We _love_ fixing bugs but we need to be able to reproduce them first."
+          >
+            <Textarea value={bugDescription} onChange={setBugDescription} placeholder="When I..." />
           </FormField>
-          <FormField label="Your email">
-            <TextInput
-              value={email}
-              onChange={setEmailAddress}
-              placeholder="e.g. simon@getresolve.io"
+          <FormField label="Is this really bad?">
+            <Checkbox
+              label="Yes, this is preventing me from using this software."
+              isChecked={bugIsBlocking}
+              onChange={setBugIsBlocking}
             />
           </FormField>
-        </div>
-        <FormField label="What do you need help with?">
-          <SelectInput
-            options={formOptions}
-            onChange={setFormType}
-            value={formType}
-            placeholder="What you need help with"
-          />
-        </FormField>
+        </>
+      )}
 
-        {formType === 'bug' && (
-          <>
-            <FormField
-              label="What did you find?"
-              helpText="The more descriptive the better. We _love_ fixing bugs but we need to be able to reproduce them first."
-            >
-              <Textarea
-                value={bugDescription}
-                onChange={setBugDescription}
-                placeholder="When I..."
-              />
-            </FormField>
-            <FormField label="Is this really bad?">
-              <Checkbox
-                label="Yes, this is preventing me from using this software."
-                isChecked={bugIsBlocking}
-                onChange={setBugIsBlocking}
-              />
-            </FormField>
-          </>
-        )}
+      {formType === 'demo' && (
+        <>
+          <FormField label="Are you currently using another provider?">
+            <SelectInput
+              options={demoCurrentProviderOptions}
+              value={demoCurrentProvider}
+              placeholder="Current provider"
+              onChange={setDemoCurrentProvider}
+            />
+          </FormField>
+          <FormField label="How many API calls do you think expect to make?">
+            <SelectInput
+              placeholder="Expected transaction volume"
+              options={demoExpectedVolumeOptions}
+              value={demoExpectedVolume}
+              onChange={setDemoExpectedVolume}
+            />
+          </FormField>
+          <FormField
+            label="Anything else we should know?"
+            helpText="Anything you want to make sure we run through in our demo for example?"
+          >
+            <Textarea
+              value={demoMessage}
+              onChange={setDemoMessage}
+              placeholder={`e.g. "I'd love to invite Jon at jon-the-cto@acme.com"`}
+            />
+          </FormField>
+        </>
+      )}
 
-        {formType === 'demo' && (
-          <>
-            <FormField label="Are you currently using another provider?">
-              <SelectInput
-                options={demoCurrentProviderOptions}
-                value={demoCurrentProvider}
-                placeholder="Current provider"
-                onChange={setDemoCurrentProvider}
-              />
-            </FormField>
-            <FormField label="How many API calls do you think expect to make?">
-              <SelectInput
-                placeholder="Expected transaction volume"
-                options={demoExpectedVolumeOptions}
-                value={demoExpectedVolume}
-                onChange={setDemoExpectedVolume}
-              />
-            </FormField>
-            <FormField
-              label="Anything else we should know?"
-              helpText="Anything you want to make sure we run through in our demo for example?"
-            >
-              <Textarea
-                value={demoMessage}
-                onChange={setDemoMessage}
-                placeholder={`e.g. "I'd love to invite Jon at jon-the-cto@acme.com"`}
-              />
-            </FormField>
-          </>
-        )}
+      {formType === 'question' && (
+        <>
+          <FormField label="What's on your mind?">
+            <Textarea value={question} onChange={setQuestion} placeholder="Enter your question…" />
+          </FormField>
+        </>
+      )}
 
-        {formType === 'question' && (
-          <>
-            <FormField label="What's on your mind?">
-              <Textarea
-                value={question}
-                onChange={setQuestion}
-                placeholder="Enter your question…"
-              />
-            </FormField>
-          </>
-        )}
+      {formType === 'feature' && (
+        <>
+          <FormField label="What's your idea?">
+            <Textarea
+              value={featureRequest}
+              onChange={setFeatureRequest}
+              placeholder="It would be great if…"
+            />
+          </FormField>
+        </>
+      )}
 
-        {formType === 'feature' && (
-          <>
-            <FormField label="What's your idea?">
-              <Textarea
-                value={featureRequest}
-                onChange={setFeatureRequest}
-                placeholder="It would be great if…"
-              />
-            </FormField>
-          </>
-        )}
+      {formType === 'security' && (
+        <>
+          <FormField
+            label="What did you find?"
+            helpText="We will get back to you, at the latest, in 48 hours."
+          >
+            <Textarea value={securityIssue} onChange={setSecurityIssue} placeholder="When I…" />
+          </FormField>
+        </>
+      )}
 
-        {formType === 'security' && (
-          <>
-            <FormField
-              label="What did you find?"
-              helpText="We will get back to you, at the latest, in 48 hours."
-            >
-              <Textarea value={securityIssue} onChange={setSecurityIssue} placeholder="When I…" />
-            </FormField>
-          </>
-        )}
-
-        <Button label="Submit" isLoading={false} isDisabled={isProcessing || !formType} />
-      </form>
-    </div>
+      <div className={styles.buttonRow}>
+        <Button label="Send" isLoading={isProcessing} isDisabled={isProcessing || !formType} />
+        <div className={styles.eta}>We respond within 2 hours.</div>
+      </div>
+    </form>
   );
 }

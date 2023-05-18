@@ -1,10 +1,4 @@
-@font-face {
-  font-family: 'Circularpro book';
-  src: url('https://assets.website-files.com/6347244ba8d63489ba51c08e/6347244ba8d634111651c0ca_CircularPro-Book.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -23,6 +17,8 @@ body {
   background: var(--background);
   color: var(--textColor);
   font-size: 14px;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
 }
  
 img, picture, video, canvas, svg {
@@ -42,18 +38,15 @@ p, h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   height: 100%;
-  align-items: center;
-  justify-content: center;
 }
 
 :root {
-  --background: #031627;
-  --textColor: #e6ebef;
-  --textColorMuted: #b7b6c9;
-
-  --inputBackground: #2c3d4c;
-  --inputBackgroundSelected: #7047eb;
+  --background: #222128;
+  --textColor: #FFFFFF;
+  --textColorMuted: #BDBCBE;
+  --inputBackground: #1b1a1f;
+  --inputBackgroundSelected: #4747eb;
   --inputBoxShadow: 0 0 0 1px #cdccda1f inset;
   --inputBoxShadowHover: 0 0 0 1px #aaaac73d inset;
-  --inputBoxShadowFocus: 0 0 0 2px #7047eb;
+  --inputBoxShadowFocus: 0 0 0 2px #4747eb;
 }
