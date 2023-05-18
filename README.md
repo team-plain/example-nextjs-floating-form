@@ -8,6 +8,8 @@ This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Open an issue with the right priority
 
+![Screenshot of demo](./screenshot.png)
+
 ### Running the example:
 
 You will need an API key from Plain first. [Check out our docs](https://docs.plain.com/core-api/authentication) on how to generate an API key.
