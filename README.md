@@ -2,11 +2,15 @@
 
 This NextJS app shows how to build a contact form using Plain's [Custom Timeline Entries](https://docs.plain.com/recipes/custom-timeline-entry-upsert) and [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk).
 
+Using this contact form you will be able to quickly prioritise customers in Plain by what they are getting in touch about and how urgent it is.
+
 This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/api-routes/introduction) (`/api/contact-form.tsx`) which calls the Plain API to:
 
 - Create the customer within Plain if they don't exist
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Open an issue with the right priority
+
+You can see what it looks like here https://example-nextjs-contact-form.vercel.app/ but you will need to run this example yourself if you want to see what it looks like within Plain as someone providing support.
 
 This is meant as a starting point that you can customise to specifically fit your product and needs.
 
