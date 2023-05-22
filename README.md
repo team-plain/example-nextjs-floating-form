@@ -10,7 +10,7 @@ This example mainly consists of one [Next.js API Route](https://nextjs.org/docs/
 - Create a Custom Timeline Entry with the contents of the contact form 
 - Open an issue with the right priority
 
-You can see what it looks like here https://example-nextjs-contact-form.vercel.app/ but you will need to run this example yourself if you want to see what it looks like within Plain as someone providing support.
+You can see what it looks like here https://example-nextjs-advanced-contact-form.vercel.app/ but you will need to run this example yourself if you want to see what it looks like within Plain as someone providing support.
 
 This is meant as a starting point that you can customise to specifically fit your product and needs.
 
