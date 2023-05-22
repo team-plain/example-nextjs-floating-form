@@ -1,4 +1,4 @@
-# Example NextJS Contact Form
+# Example NextJS Advanced Contact Form
 
 This NextJS app shows how to build a contact form using Plain's [Custom Timeline Entries](https://docs.plain.com/recipes/custom-timeline-entry-upsert) and [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk).
 
