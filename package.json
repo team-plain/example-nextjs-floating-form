@@ -18,7 +18,6 @@
     "@types/ua-parser-js": "^0.7.36",
     "assert-ts": "^0.3.4",
     "csstype": "^3.1.2",
-    "lodash": "^4.17.21",
     "next": "13.3.2",
     "prettier": "2.8.8",
     "react": "18.2.0",

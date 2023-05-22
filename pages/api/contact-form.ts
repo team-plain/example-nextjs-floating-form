@@ -1,6 +1,5 @@
 import { inspect } from 'util';
 import { PlainClient, UpsertCustomTimelineEntryInput } from '@team-plain/typescript-sdk';
-import _ from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const apiKey = process.env.PLAIN_API_KEY;
@@ -12,8 +11,6 @@ if (!apiKey) {
 const client = new PlainClient({
   apiKey,
 });
-
-const customerGroupKeys = ['free-tier', 'design-partner', 'enterprise'] as const;
 
 export type ResponseData = {
   error: string | null;
@@ -44,14 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     },
     onCreate: {
       fullName: body.customer.name,
-      customerGroupIdentifiers: [
-        {
-          // Here we are picking a random customer group to add the customer to
-          // for demo purposes but you could use your own logic to decide which group
-          // a customer should be part of.
-          customerGroupKey: _.sample(customerGroupKeys),
-        },
-      ],
       email: {
         email: body.customer.email,
         isVerified: true,
