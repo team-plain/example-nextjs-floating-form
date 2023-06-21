@@ -3,12 +3,12 @@
     color: var(--textColor);
     background: var(--inputBackground);
     border-radius: 8px;
-    padding: 8px 16px;
+    padding: 6px 12px;
     outline: none;
     border: none;
     display: block;
     width: 100%;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 24px;
 }
 

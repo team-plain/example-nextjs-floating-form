@@ -41,12 +41,12 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 :root {
-  --background: #222128;
-  --textColor: #FFFFFF;
-  --textColorMuted: #BDBCBE;
-  --inputBackground: #1b1a1f;
-  --inputBackgroundSelected: #4747eb;
-  --inputBoxShadow: 0 0 0 1px #cdccda1f inset;
+  --background: #FFF;
+  --textColor: #262F40;
+  --textColorMuted: #626B7F;
+  --inputBackground: #FFFFFF;
+  --inputBackgroundSelected: #7e22ce;
+  --inputBoxShadow: 0 0 0 1px #cdccda66 inset;
   --inputBoxShadowHover: 0 0 0 1px #aaaac73d inset;
-  --inputBoxShadowFocus: 0 0 0 2px #4747eb;
+  --inputBoxShadowFocus: 0 0 0 2px #7e22ce;
 }

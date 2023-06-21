@@ -1,13 +1,13 @@
 .button {
     padding: 8px 16px;
     font-weight: 500;
-    background: #4747eb;
-    color: var(--textColor);
+    background: #e9d5ff;
+    color: #581c87;
     border-radius: 8px;
     outline: none;
     border: none;
     display: block;
-    max-width: 180px;
+    
     line-height: 24px;
     transition: background 150ms linear;
     position: relative;
@@ -18,23 +18,23 @@
 }
 
 .button:hover:not(:disabled) {
-    background: #5050f0;
+    background: #d8b4fe;
 }
 
 .button:disabled {
-    background: #cdccda1f;
-    color: #7f7e80;
+    background: #e4e4e7;
+    color: #27272a;
 }
 
 
 .spinner {
-    --size: 18px;
+    --size: 16px;
     position: absolute;
     left: 50%;
     top: 50%;
     width: var(--size);
     height: var(--size);
-    border: 2px solid #FFF;
+    border: 2px solid #27272a;
     border-bottom-color: transparent;
     border-radius: 50%;
     display: inline-block;

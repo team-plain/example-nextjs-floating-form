@@ -17,18 +17,9 @@ export type ResponseData = {
 };
 
 export type RequestBody = {
-  customer: {
-    name: string;
-    email: string;
-  };
-  customeTimelineEntry: {
-    title: string;
-    components: UpsertCustomTimelineEntryInput['components'];
-  };
-  issue: {
-    issueTypeId: string;
-    priority: number | null;
-  };
+  name: string;
+  email: string;
+  message: string;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
@@ -37,12 +28,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   const upsertCustomerRes = await client.upsertCustomer({
     identifier: {
-      emailAddress: body.customer.email,
+      emailAddress: body.email,
     },
     onCreate: {
-      fullName: body.customer.name,
+      fullName: body.name,
       email: {
-        email: body.customer.email,
+        email: body.email,
         isVerified: true,
       },
     },
@@ -60,8 +51,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   const upsertTimelineEntryRes = await client.upsertCustomTimelineEntry({
     customerId: upsertCustomerRes.data.id,
-    title: body.customeTimelineEntry.title,
-    components: body.customeTimelineEntry.components,
+    title: 'Contact form',
+    components: [
+      {
+        componentText: {
+          text: body.message,
+        },
+      },
+    ],
     changeCustomerStatusToActive: true,
   });
 
@@ -73,19 +70,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   console.log(`Custom timeline entry upserted ${upsertTimelineEntryRes.data.timelineEntry.id}.`);
-
-  const createIssueRes = await client.createIssue({
-    customerId: upsertCustomerRes.data.id,
-    issueTypeId: body.issue.issueTypeId,
-    priorityValue: body.issue.priority,
-  });
-
-  if (createIssueRes.error) {
-    console.error(inspect(createIssueRes.error, { showHidden: false, depth: null, colors: true }));
-    return res.status(500).json({ error: createIssueRes.error.message });
-  }
-
-  console.log(`Issue created ${createIssueRes.data.id}`);
 
   res.status(200).json({ error: null });
 }

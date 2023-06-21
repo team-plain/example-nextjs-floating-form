@@ -1,13 +1,18 @@
-.basicDetails {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-}
-
 .form {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeIn 300ms forwards 300ms;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .buttonRow {
