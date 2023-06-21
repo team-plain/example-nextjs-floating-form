@@ -49,6 +49,7 @@ export function HelpButton() {
           sideOffset={12}
           collisionPadding={20}
           side="top"
+          align="end"
         >
           {isContactFormOpen ? (
             <ContactForm
@@ -62,13 +63,14 @@ export function HelpButton() {
               <p className={styles.popoverNudge}>
                 Psss... Discord is great if you want a quick reply from our community!
               </p>
-              <LinkRow label="Join on Discord" href="#" icon={<DiscordIcon />} />
-              <LinkRow label="Documentation" href="#" icon={<BookIcon />} />
+              <LinkRow label="Join on Discord" href="https://discord.com/" icon={<DiscordIcon />} />
+              <LinkRow label="Documentation" href="https://docs.plain.com/" icon={<BookIcon />} />
               <LinkRow
                 label="Get in touch"
                 href="#"
                 icon={<ChatAltIcon />}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setIsContactFormOpen(true);
                 }}
               />
