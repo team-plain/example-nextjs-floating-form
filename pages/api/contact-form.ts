@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import { PlainClient, UpsertCustomTimelineEntryInput } from '@team-plain/typescript-sdk';
+import { PlainClient } from '@team-plain/typescript-sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const apiKey = process.env.PLAIN_API_KEY;
