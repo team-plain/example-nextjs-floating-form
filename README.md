@@ -13,7 +13,7 @@ You can see what it looks like here https://example-nextjs-floating-form.vercel.
 
 This is meant as a starting point that you can customise to specifically fit your product and needs.
 
-![screenshot.png](./screenshot.png)
+![screenshot.png](./.github/screenshot.png)
 
 ### Interesting files:
 
