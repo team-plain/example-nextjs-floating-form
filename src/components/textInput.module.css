@@ -1,7 +1,7 @@
 .input {
-    box-shadow: var(--inputBoxShadow);
-    color: var(--textColor);
-    background: var(--inputBackground);
+    box-shadow: 0 0 0 1px #cdccda66 inset;
+    color: #262F40;
+    background: #FFF;
     border-radius: 8px;
     padding: 6px 12px;
     outline: none;
@@ -13,13 +13,13 @@
 }
 
 .input::placeholder {
-    color: var(--textColorMuted);
+    color: #626B7F;
 }
 
 .input:hover {
-    box-shadow: var(--inputBoxShadowHover);
+    box-shadow: 0 0 0 1px #aaaac73d inset;
 }
 
 .input:focus {
-    box-shadow: var(--inputBoxShadowFocus);
+    box-shadow: 0 0 0 2px #7e22ce;
 }

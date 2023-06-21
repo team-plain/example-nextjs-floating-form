@@ -5,9 +5,3 @@
     margin-bottom: 8px;
     display: block;
 }
-
-.helpText {
-    margin-bottom: 12px;
-    color: var(--textColorMuted);
-    display: block;
-}

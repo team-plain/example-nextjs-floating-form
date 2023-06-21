@@ -9,7 +9,7 @@
     display: block;
     
     line-height: 24px;
-    transition: background 150ms linear;
+    transition: background 50ms linear;
     position: relative;
 }
 

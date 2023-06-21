@@ -1,7 +1,7 @@
 .textarea {
-    box-shadow: var(--inputBoxShadow);
-    color: var(--textColor);
-    background: var(--inputBackground);
+    box-shadow: 0 0 0 1px #cdccda66 inset;
+    color: #262F40;
+    background: #FFF;
     border-radius: 8px;
     padding: 8px 12px;
     outline: none;
@@ -10,18 +10,18 @@
     width: 100%;
     font-size: 13px;
     line-height: 24px;
-    resize: vertical;
+    resize: none;
     min-height: 100px;
 }
 
 .textarea::placeholder {
-    color: var(--textColorMuted);
+    color: #626B7F;
 }
 
 .textarea:hover {
-    box-shadow: var(--inputBoxShadowHover);
+    box-shadow: 0 0 0 1px #aaaac73d inset;
 }
 
 .textarea:focus {
-    box-shadow: var(--inputBoxShadowFocus);
+    box-shadow: 0 0 0 2px #7e22ce;
 }

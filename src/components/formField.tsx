@@ -4,8 +4,6 @@ import styles from './formField.module.css';
 export interface FormFieldProps {
   label?: string;
   labelFor?: string;
-  helpText?: string | null;
-  errorMessage?: string | null;
   children: React.ReactNode;
 }
 
@@ -16,7 +14,6 @@ export const FormField = (props: FormFieldProps) => (
         {props.label}
       </label>
     )}
-    {props.helpText && <span className={styles.helpText}>{props.helpText}</span>}
     <div>{props.children}</div>
   </div>
 );

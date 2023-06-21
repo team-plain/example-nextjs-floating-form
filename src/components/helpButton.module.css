@@ -66,14 +66,14 @@
 }
 
 .popoverTitle {
-  color: var(--textColor);
+  color: #262F40;
   font-weight: 500;
   font-size: 1.05rem;
   margin-bottom: 8px;
 }
 
 .popoverNudge {
-  color: var(--textColorMuted);
+  color: #626B7F;
   margin-bottom: 16px;
   font-size: 0.8rem;
 }
