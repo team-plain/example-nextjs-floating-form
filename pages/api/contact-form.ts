@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   console.log(`Customer upserted ${upsertCustomerRes.data.customer.id}`);
 
   const upsertTimelineEntryRes = await client.upsertCustomTimelineEntry({
-    customerId: upsertCustomerRes.data?.customer.id,
+    customerId: upsertCustomerRes.data.customer.id,
     title: 'Contact form',
     components: [
       {
