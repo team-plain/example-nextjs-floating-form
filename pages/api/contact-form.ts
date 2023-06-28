@@ -47,10 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     return res.status(500).json({ error: upsertCustomerRes.error.message });
   }
 
-  console.log(`Customer upserted ${upsertCustomerRes.data.id}`);
+  console.log(`Customer upserted ${upsertCustomerRes.data.customer.id}`);
 
   const upsertTimelineEntryRes = await client.upsertCustomTimelineEntry({
-    customerId: upsertCustomerRes.data.id,
+    customerId: upsertCustomerRes.data?.customer.id,
     title: 'Contact form',
     components: [
       {
