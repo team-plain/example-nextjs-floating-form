@@ -64,7 +64,7 @@ export function HelpButton() {
                 Psss... Discord is great if you want a quick reply from our community!
               </p>
               <LinkRow label="Join on Discord" href="https://discord.com/" icon={<DiscordIcon />} />
-              <LinkRow label="Documentation" href="https://docs.plain.com/" icon={<BookIcon />} />
+              <LinkRow label="Documentation" href="https://plain.com/docs/" icon={<BookIcon />} />
               <LinkRow
                 label="Get in touch"
                 href="#"

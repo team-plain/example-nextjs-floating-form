@@ -1,6 +1,6 @@
 # Example NextJS Floating Contact Form
 
-This NextJS app shows how to build a floating support bubble using Plain's [Custom Timeline Entries](https://docs.plain.com/recipes/custom-timeline-entry-upsert) and [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk).
+This NextJS app shows how to build a floating support bubble using Plain's [Custom Timeline Entries](https://www.plain.com/docs/custom-timeline-entries) and [Typescript SDK](https://www.npmjs.com/package/@team-plain/typescript-sdk).
 
 Using this contact form customers can easily get in touch with you, or jump to your discord community or docs.
 
@@ -22,7 +22,7 @@ This is meant as a starting point that you can customise to specifically fit you
 
 ### Running the example:
 
-You will need an API key from Plain first. [Check out our docs](https://docs.plain.com/core-api/authentication) on how to generate an API key.
+You will need an API key from Plain first. [Check out our docs](https://www.plain.com/docs/graphql-api/authentication) on how to generate an API key.
 
 For this demo you will need to grant the API key the following permissions:
 
