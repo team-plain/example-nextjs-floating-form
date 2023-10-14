@@ -49,8 +49,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   console.log(`Customer upserted ${upsertCustomerRes.data.customer.id}`);
 
-  const upsertTimelineEntryRes = await client.upsertCustomTimelineEntry({
-    customerId: upsertCustomerRes.data.customer.id,
+  const createThreadRes = await client.createThread({
+    customerIdentifier: {
+      customerId: upsertCustomerRes.data.customer.id,
+    },
     title: 'Contact form',
     components: [
       {
@@ -59,17 +61,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         },
       },
     ],
-    changeCustomerStatusToActive: true,
   });
 
-  if (upsertTimelineEntryRes.error) {
-    console.error(
-      inspect(upsertTimelineEntryRes.error, { showHidden: false, depth: null, colors: true })
-    );
-    return res.status(500).json({ error: upsertTimelineEntryRes.error.message });
+  if (createThreadRes.error) {
+    console.error(inspect(createThreadRes.error, { showHidden: false, depth: null, colors: true }));
+    return res.status(500).json({ error: createThreadRes.error.message });
   }
 
-  console.log(`Custom timeline entry upserted ${upsertTimelineEntryRes.data.timelineEntry.id}.`);
+  console.log(`Thread created ${createThreadRes.data.id}.`);
 
   res.status(200).json({ error: null });
 }
