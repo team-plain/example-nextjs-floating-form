@@ -8,7 +8,7 @@ const Home: NextPage = () => {
   let script = document.createElement('script');
   script.async = false;
   script.onload = function(){
-    Plain.init({
+    (window as any).Plain.init({
       appId: 'liveChatApp_01J9XJ0Z9WZC9CXQXMR7FT1BC7',
       hideLauncher: true,
     });
