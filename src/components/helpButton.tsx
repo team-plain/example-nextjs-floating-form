@@ -74,6 +74,16 @@ export function HelpButton() {
                   setIsContactFormOpen(true);
                 }}
               />
+              <LinkRow
+                label="Chat with us"
+                href="#"
+                icon={<ChatAltIcon />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  (window as any).Plain.open();
+                }}
+              />
             </>
           )}
 
